@@ -1,0 +1,708 @@
+/* ===========================
+   SHOWROOM DASHBOARD (Sales)
+   =========================== */
+
+/* =====================================================
+   HARD SCROLL FIX (Odoo client action)
+   Put these classes in XML:
+   - root:  o_tm_dash_root
+   - body:  o_tm_dash_scroll
+   ===================================================== */
+
+.o_tm_dash_root{
+  height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.o_tm_dash_scroll{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 90px; /* extra space so last cards are visible */
+}
+
+/* KPI header row */
+.tm_kpi_head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.tm_kpi_title{
+  font-weight:800;
+  font-size:13px;
+}
+
+.tm_kpi_fromto{
+  font-size:12px;
+  font-weight:700;
+  opacity:.85;
+  white-space:nowrap;
+}
+
+.tm_kpi_value{
+  font-size:40px;
+  font-weight:900;
+  line-height:1;
+  margin-top:6px;
+}
+
+.tm_kpi_sub{
+  margin-top:10px;
+  font-size:12px;
+  opacity:.9;
+}
+
+/* Colored cards only when tm_kpi_tile is applied */
+.tm_kpi_tile{
+  border:0;
+  border-radius:10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.10) !important;
+  position: relative; /* shimmer */
+  overflow: hidden;   /* shimmer */
+
+  .card-body{
+    border-radius:10px;
+  }
+
+  .tm_kpi_title,
+  .tm_kpi_fromto,
+  .tm_kpi_sub{
+    color: rgba(255,255,255,.90) !important;
+  }
+
+  .tm_kpi_value,
+  .fw-bold{
+    color:#fff !important;
+  }
+
+  .text-muted,
+  .small{
+    color: rgba(255,255,255,.85) !important;
+  }
+
+  a{
+    color:#fff !important;
+    text-decoration:none;
+  }
+}
+
+/* Colors */
+.tm_kpi_green{ background:#118c3a; }
+.tm_kpi_orange{ background:#b57900; }
+.tm_kpi_red{ background:#c62828; }
+.tm_kpi_blue{ background:#1565c0; }
+
+/* ===================================================
+   FIX SECOND ROW COLORED SALES CARDS SIZE
+   =================================================== */
+
+.tm_kpi_tile {
+  min-height: 110px !important;
+}
+
+/* Smaller padding for revenue/balance/missing */
+.tm_kpi_tile .card-body {
+  padding: 14px 16px !important;
+}
+
+/* Reduce big number size slightly */
+.tm_kpi_tile .fs-3,
+.tm_kpi_tile .fw-bold {
+  font-size: 26px !important;
+  line-height: 1.1;
+}
+
+/* Titles compact */
+.tm_kpi_tile .text-muted {
+  font-size: 13px !important;
+  margin-bottom: 4px;
+}
+
+/* Sub text */
+.tm_kpi_tile .small {
+  font-size: 12px !important;
+  margin-top: 4px;
+}
+
+/* Prevent card stretching */
+.tm_kpi_tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* ===================================================
+   FIX TOP BAR (buttons + date filters in one line)
+   =================================================== */
+
+.o_tm_ribbon{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: nowrap;      /* keep in one line */
+  margin-bottom: 14px;
+
+  /* Sticky ribbon works with the new scroll container */
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #fff;
+  padding: 10px 14px;
+  border-radius: 10px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+
+  /* ✅ IMPORTANT: avoid clipping the range bar */
+  overflow: visible !important;
+}
+
+.o_tm_ribbon_left{
+  flex: 0 0 auto;
+  min-width: 220px;       /* keeps title stable */
+}
+
+.o_tm_ribbon_center{
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.o_tm_ribbon_right{
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: flex-end;
+  white-space: nowrap;
+
+  /* ✅ IMPORTANT: avoid clipping the range bar */
+  overflow: visible !important;
+}
+
+/* Make the date/filter row stay horizontal */
+.o_tm_ribbon_right .d-flex{
+  flex-wrap: nowrap !important;
+  gap: 10px !important;
+  align-items: flex-end !important;
+
+  /* ✅ IMPORTANT: avoid clipping children */
+  overflow: visible !important;
+}
+
+/* Reduce date input width so it fits */
+.o_tm_ribbon_right input[type="date"]{
+  width: 150px;
+}
+
+/* Buttons look consistent */
+.o_tm_ribbon_btn{
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid #d7d7d7;
+  background: #f7f7f7;
+  font-weight: 700;
+}
+
+/* ✅ IMPORTANT: ribbon button icons should NOT move */
+.o_tm_ribbon_btn i{
+  animation: none !important;
+  transform: none !important;
+}
+
+.o_tm_ribbon_btn.active{
+  background: #6b7f1b;
+  color: #fff;
+  border-color: transparent;
+}
+
+/* Responsive: on small screens allow wrapping */
+@media (max-width: 992px){
+  .o_tm_ribbon{
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+  .o_tm_ribbon_center{
+    order: 2;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .o_tm_ribbon_right{
+    order: 3;
+    width: 100%;
+    justify-content: flex-start;
+  }
+  .o_tm_ribbon_right input[type="date"]{
+    width: 100%;
+    min-width: 160px;
+  }
+}
+
+/* ===================================================
+   Right sidebar panel
+   =================================================== */
+
+.tm_side_panel{
+  position: sticky;
+  top: 70px; /* below sticky ribbon */
+}
+
+.tm_side_item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 10px;
+  border-radius:8px;
+  cursor:pointer;
+  border:1px solid #eee;
+  margin-top:8px;
+}
+
+.tm_side_item:hover{
+  background:#f7f7f7;
+}
+
+/* ✅ Only sidebar icons move (not all icons) */
+.tm_side_item i{
+  display:inline-block;
+}
+
+/* =====================================================
+   ✅ EXECUTIVE-LIKE ICON BADGE + PURPLE ON HOVER (SHOWROOM)
+   (NO OTHER CHANGES)
+   ===================================================== */
+
+/* Base icon badge look (kpi + sidebar + table titles if any) */
+.tm_kpi_title i,
+.tm_side_item i,
+.o_tm_dash_scroll .fw-bold i,
+.o_tm_dash_scroll .card .fw-bold i,
+.o_tm_dash_scroll .card-body .fw-bold i{
+  font-size: 14px;
+  margin-right: 6px;
+  opacity: .95;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  padding: 3px 6px;
+  transition: background .18s ease, color .18s ease, transform .18s ease, filter .18s ease;
+}
+
+/* KPI icons: white badge on colored tiles */
+.tm_kpi_title i{
+  color: rgba(255,255,255,.95);
+  background: rgba(255,255,255,.22);
+}
+
+/* Sidebar + section icons: purple badge (executive style) */
+.tm_side_item i,
+.o_tm_dash_scroll .fw-bold i,
+.o_tm_dash_scroll .card .fw-bold i,
+.o_tm_dash_scroll .card-body .fw-bold i{
+  color: #6f42c1;
+  background: rgba(111,66,193,.12);
+}
+
+/* ✅ Purple-on-touch/hover (like executive) */
+.tm_kpi_tile:hover .tm_kpi_title i,
+.tm_side_item:hover i,
+.o_tm_dash_scroll .card:hover .fw-bold i{
+  color: #4f46e5;
+  background: rgba(79,70,229,.18);
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+
+/* =====================================================
+   SHOWROOM — STRONGER + CONTROLLED ANIMATIONS (NO JS)
+   - Shimmer is MORE visible
+   - Only SELECTED icons move:
+       * KPI title icons move
+       * Sidebar item icons move
+       * Ribbon button icons DO NOT move
+   ===================================================== */
+
+/* Entrance */
+@keyframes srPopIn {
+  0%   { opacity: 0; transform: translateY(14px) scale(.985); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Gentle float */
+@keyframes srFloat {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-6px); }
+  100% { transform: translateY(0); }
+}
+
+/* Glow pulse */
+@keyframes srGlow {
+  0%   { box-shadow: 0 1px 4px rgba(0,0,0,.10), 0 0 0 rgba(111,66,193,0); }
+  50%  { box-shadow: 0 16px 34px rgba(0,0,0,.16), 0 0 30px rgba(111,66,193,.28); }
+  100% { box-shadow: 0 1px 4px rgba(0,0,0,.10), 0 0 0 rgba(111,66,193,0); }
+}
+
+/* ✅ STRONG shimmer sweep (more visible) */
+@keyframes srShimmerStrong {
+  0%   { transform: translateX(-160%) skewX(-10deg); opacity: 0; }
+  10%  { opacity: .45; }
+  55%  { opacity: .45; }
+  100% { transform: translateX(160%) skewX(-10deg); opacity: 0; }
+}
+
+/* Icon motion (small) */
+@keyframes srIconBounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+/* Icon wiggle (for variety on sidebar) */
+@keyframes srIconWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  35%      { transform: rotate(-6deg); }
+  70%      { transform: rotate(6deg); }
+}
+
+/* -------------------------------------------------
+   Apply entrance once
+   ------------------------------------------------- */
+
+.o_tm_dash_scroll .tm_kpi_tile,
+.o_tm_dash_scroll .card,
+.tm_side_panel,
+.tm_side_item{
+  animation: srPopIn .5s ease both;
+}
+
+/* Stagger entrance for KPI tiles */
+.o_tm_dash_scroll .tm_kpi_tile:nth-of-type(1){ animation-delay: .00s; }
+.o_tm_dash_scroll .tm_kpi_tile:nth-of-type(2){ animation-delay: .06s; }
+.o_tm_dash_scroll .tm_kpi_tile:nth-of-type(3){ animation-delay: .12s; }
+.o_tm_dash_scroll .tm_kpi_tile:nth-of-type(4){ animation-delay: .18s; }
+.o_tm_dash_scroll .tm_kpi_tile:nth-of-type(5){ animation-delay: .24s; }
+.o_tm_dash_scroll .tm_kpi_tile:nth-of-type(6){ animation-delay: .30s; }
+
+/* -------------------------------------------------
+   Continuous animations
+   ------------------------------------------------- */
+
+/* KPI tiles: float + glow */
+.tm_kpi_tile{
+  animation:
+    srPopIn .5s ease both,
+    srFloat 3.2s ease-in-out infinite,
+    srGlow  3.2s ease-in-out infinite !important;
+  transition: transform .18s ease;
+}
+
+/* Regular cards (tables etc.) slower */
+.o_tm_dash_scroll .card{
+  animation:
+    srPopIn .5s ease both,
+    srFloat 6.0s ease-in-out infinite,
+    srGlow  6.0s ease-in-out infinite !important;
+  transition: transform .18s ease;
+}
+
+/* Sidebar panel gentle */
+.tm_side_panel{
+  animation:
+    srPopIn .5s ease both,
+    srFloat 7.0s ease-in-out infinite,
+    srGlow  7.0s ease-in-out infinite !important;
+}
+
+/* Sidebar items: tiny float only */
+.tm_side_item{
+  animation:
+    srPopIn .5s ease both,
+    srFloat 4.6s ease-in-out infinite !important;
+}
+
+/* -------------------------------------------------
+   ✅ STRONG shimmer on KPI tiles ONLY
+   ------------------------------------------------- */
+.tm_kpi_tile::after{
+  content:"";
+  position:absolute;
+  top:-55%;
+  left:-75%;
+  width:65%;
+  height:210%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(255,255,255,.10) 18%,
+    rgba(255,255,255,.85) 45%,
+    rgba(255,255,255,.10) 72%,
+    transparent 100%
+  );
+  transform: translateX(-160%) skewX(-10deg);
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  filter: blur(.2px);
+  animation: srShimmerStrong 2.3s ease-in-out infinite;
+}
+
+/* Make shimmer timing slightly different so it feels alive */
+.tm_kpi_tile:nth-of-type(1)::after{ animation-delay: .00s; }
+.tm_kpi_tile:nth-of-type(2)::after{ animation-delay: .25s; }
+.tm_kpi_tile:nth-of-type(3)::after{ animation-delay: .50s; }
+.tm_kpi_tile:nth-of-type(4)::after{ animation-delay: .75s; }
+.tm_kpi_tile:nth-of-type(5)::after{ animation-delay: 1.00s; }
+.tm_kpi_tile:nth-of-type(6)::after{ animation-delay: 1.25s; }
+
+/* -------------------------------------------------
+   ✅ ICONS: only some move
+   ------------------------------------------------- */
+
+/* KPI title icons move */
+.tm_kpi_title i{
+  display:inline-block;
+  animation: srIconBounce 1.2s ease-in-out infinite;
+}
+
+/* Sidebar icons move (wiggle + bounce alternating) */
+.tm_side_item:nth-child(odd) i{
+  animation: srIconWiggle 1.6s ease-in-out infinite;
+}
+.tm_side_item:nth-child(even) i{
+  animation: srIconBounce 1.25s ease-in-out infinite;
+}
+
+/* Ensure other random icons do NOT move */
+.o_tm_dash_scroll .card i{
+  animation: none !important;
+  transform: none !important;
+}
+
+/* -------------------------------------------------
+   Hover boost
+   ------------------------------------------------- */
+.tm_kpi_tile:hover,
+.o_tm_dash_scroll .card:hover{
+  transform: translateY(-10px);
+}
+.tm_side_item:hover{
+  transform: translateY(-4px);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .tm_kpi_tile,
+  .o_tm_dash_scroll .card,
+  .tm_side_panel,
+  .tm_side_item,
+  .tm_kpi_tile::after,
+  .tm_kpi_title i,
+  .tm_side_item i,
+  .o_tm_dash_scroll .fw-bold i{
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* =====================================================
+   ✅ RANGE FILTER (FIXED — VISIBLE ON WHITE RIBBON)
+   This replaces the old range styles that were hiding it.
+   ===================================================== */
+
+.tm_range_bar{
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+
+  padding: 6px 8px;
+  border-radius: 12px;
+
+  /* ✅ visible on white ribbon */
+  background: #f3f4f6;
+  border: 1px solid rgba(0,0,0,0.12);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.10);
+
+  /* ✅ prevent flex shrinking */
+  flex: 0 0 auto;
+  min-width: max-content;
+}
+
+.tm_range_btn{
+  border: 1px solid rgba(0,0,0,0.14);
+  background: rgba(0,0,0,0.04);
+  color: #111;
+
+  font-weight: 800;
+  padding: 6px 12px;
+  border-radius: 999px;
+  line-height: 1;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  transition: transform .12s ease, background .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+
+.tm_range_btn:hover{
+  transform: translateY(-1px);
+  background: rgba(0,0,0,0.07);
+  border-color: rgba(0,0,0,0.22);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.14);
+}
+
+.tm_range_btn:active{
+  transform: translateY(0px);
+  box-shadow: none;
+}
+
+.tm_range_btn.active{
+  background: #0d6efd;
+  border-color: #0d6efd;
+  color: #fff;
+  box-shadow: 0 10px 22px rgba(13,110,253,0.25);
+}
+
+/* Disabled inputs look intentional */
+.o_tm_ribbon_right .form-control[disabled]{
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.o_tm_ribbon_right .btn[disabled]{
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* Mobile friendly */
+@media (max-width: 768px){
+  .tm_range_bar{ width: 100%; }
+}
+/* =====================================================
+   ✅ SHOWROOM CHART SELECTION + CANVAS (NEW)
+   - Adds professional selector pills (Table/Bar/Line/Donut/Area)
+   - Adds canvas container styling
+   - Keeps your existing tables + animations
+   ===================================================== */
+
+/* Make chart cards a bit more "executive" */
+.tm_chart_card{
+  border-radius: 12px;
+}
+
+/* Chart header: title left, tools right */
+.tm_chart_header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom: 10px;
+}
+
+/* Tools container */
+.tm_chart_tools{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+/* Pill selector (Table/Bar/Line/Donut/Area) */
+.tm_view_pills{
+  display:flex;
+  gap:6px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* Each pill button */
+.tm_pill{
+  border: 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: 12px;
+  background: transparent;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  transition: transform .12s ease, background .12s ease, box-shadow .12s ease, color .12s ease;
+}
+
+.tm_pill:hover{
+  transform: translateY(-1px);
+  background: rgba(0,0,0,0.06);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.10);
+}
+
+.tm_pill:active{
+  transform: translateY(0px);
+  box-shadow: none;
+}
+
+/* Active pill (matches your dashboard style) */
+.tm_pill.active{
+  background: rgba(13,110,253,0.14);
+  color: #0d6efd;
+  box-shadow: 0 10px 20px rgba(13,110,253,0.18);
+}
+
+/* Canvas wrapper (nice background + fixed height) */
+.tm_chart_canvas_wrap{
+  height: 260px;
+  width: 100%;
+  border-radius: 12px;
+  background: rgba(0,0,0,0.02);
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 10px;
+  overflow: hidden;
+}
+
+/* Canvas fills the container */
+.tm_chart_canvas{
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Make tables look cleaner when used as fallback */
+.tm_table_compact{
+  margin-bottom: 0;
+}
+
+.tm_table_compact td{
+  vertical-align: middle;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/* Hover for clickable rows (your table actions) */
+.tm_table_compact tr[role="button"]:hover{
+  background: rgba(13,110,253,0.06);
+}
+
+/* Prevent selector pills from being affected by your global icon animation rules */
+.tm_view_pills i,
+.tm_pill i{
+  animation: none !important;
+  transform: none !important;
+}
+
+/* On small screens, let pills wrap */
+@media (max-width: 768px){
+  .tm_chart_header{
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .tm_view_pills{
+    flex-wrap: wrap;
+  }
+  .tm_chart_canvas_wrap{
+    height: 220px;
+  }
+}

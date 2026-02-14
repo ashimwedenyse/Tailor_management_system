@@ -1,0 +1,781 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="tailor_management.TailorExecutiveDashboard">
+
+    <!-- ROOT (scroll container) -->
+    <div class="tm_dash tm_dash_scroll">
+
+      <!-- TOP MODULES BAR -->
+      <div class="tm_topbar">
+        <button class="tm_mod tm_mod_olive" t-on-click="() => goDashboard('executive')">
+          <i class="fa fa-line-chart me-2"></i><span>Executive</span>
+        </button>
+
+        <button class="tm_mod tm_mod_gold" t-on-click="() => goDashboard('showroom')">
+          <i class="fa fa-building me-2"></i><span>Showroom</span>
+        </button>
+
+        <button class="tm_mod tm_mod_green" t-on-click="() => goDashboard('production')">
+          <i class="fa fa-industry me-2"></i><span>Production</span>
+        </button>
+
+        <button class="tm_mod tm_mod_teal" t-on-click="openCustomers">
+          <i class="fa fa-users me-2"></i><span>Customers</span>
+        </button>
+
+        <button class="tm_mod tm_mod_blue" t-on-click="openOrdersHome">
+          <i class="fa fa-shopping-cart me-2"></i><span>Orders</span>
+        </button>
+
+        <button class="tm_mod tm_mod_navy" t-on-click="openReports">
+          <i class="fa fa-file-text-o me-2"></i><span>Reports</span>
+        </button>
+      </div>
+
+      <!-- HEADER ROW -->
+      <div class="tm_header">
+        <div class="tm_header_left">
+          <h2 class="m-0">
+            <i class="fa fa-dashboard me-2"></i>Executive Dashboard
+          </h2>
+        </div>
+
+        <!-- ✅ FILTER BAR -->
+        <div class="tm_header_right">
+          <div class="tm_filterbar d-flex flex-wrap gap-2 align-items-end">
+
+            <!-- Range Pills -->
+            <div class="tm_range_group">
+              <label class="form-label mb-0">Range</label>
+              <div class="btn-group tm_range_pills" role="group">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        t-att-class="state.filters.range == 'today' ? 'active' : ''"
+                        t-on-click="() => setRange('today')">Today</button>
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        t-att-class="state.filters.range == '7d' ? 'active' : ''"
+                        t-on-click="() => setRange('7d')">7d</button>
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        t-att-class="state.filters.range == '30d' ? 'active' : ''"
+                        t-on-click="() => setRange('30d')">30d</button>
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        t-att-class="state.filters.range == 'custom' ? 'active' : ''"
+                        t-on-click="() => setRange('custom')">Custom</button>
+              </div>
+            </div>
+
+            <!-- Custom Dates -->
+            <div>
+              <label class="form-label mb-0">From</label>
+              <input type="date" class="form-control"
+                     t-model="state.filters.date_from"
+                     t-att-disabled="state.filters.range != 'custom'"/>
+            </div>
+
+            <div>
+              <label class="form-label mb-0">To</label>
+              <input type="date" class="form-control"
+                     t-model="state.filters.date_to"
+                     t-att-disabled="state.filters.range != 'custom'"/>
+            </div>
+
+            <!-- Tailor -->
+            <div style="min-width:180px;">
+              <label class="form-label mb-0">Tailor</label>
+              <select class="form-select" t-on-change="onTailorChange">
+                <option value="" t-att-selected="!state.filters.tailor_id">All Tailors</option>
+                <t t-foreach="state.tailors" t-as="tt" t-key="tt.id">
+                  <option t-att-value="tt.id"
+                          t-att-selected="state.filters.tailor_id == tt.id">
+                    <t t-esc="tt.name"/>
+                  </option>
+                </t>
+              </select>
+            </div>
+
+            <!-- Status -->
+            <div style="min-width:170px;">
+              <label class="form-label mb-0">Status</label>
+              <select class="form-select" t-on-change="onStatusChange">
+                <option value="" t-att-selected="!state.filters.status">All</option>
+                <option value="confirmed" t-att-selected="state.filters.status=='confirmed'">Confirmed</option>
+                <option value="cutting" t-att-selected="state.filters.status=='cutting'">Cutting</option>
+                <option value="sewing" t-att-selected="state.filters.status=='sewing'">Sewing</option>
+                <option value="qc" t-att-selected="state.filters.status=='qc'">QC</option>
+                <option value="ready_delivery" t-att-selected="state.filters.status=='ready_delivery'">Ready Delivery</option>
+                <option value="delivered" t-att-selected="state.filters.status=='delivered'">Delivered</option>
+                <option value="cancel" t-att-selected="state.filters.status=='cancel'">Cancelled</option>
+              </select>
+            </div>
+
+            <!-- Actions -->
+            <div class="ms-auto d-flex gap-2">
+              <button class="btn btn-outline-secondary" t-on-click="refresh">
+                <i class="fa fa-refresh me-1"></i>Refresh
+              </button>
+              <button class="btn btn-primary" t-on-click="applyFilters">
+                <i class="fa fa-filter me-1"></i>Apply
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- BODY -->
+      <div class="tm_body">
+
+        <!-- MAIN -->
+        <div class="tm_main">
+
+          <t t-if="state.loading">
+            <div class="alert alert-info">
+              <i class="fa fa-spinner fa-spin me-2"></i>Loading KPIs…
+            </div>
+          </t>
+
+          <t t-else="">
+            <t t-set="k" t-value="state.data.kpis"/>
+            <!-- ✅ real selected dates -->
+            <t t-set="date_from" t-value="state.filters.date_from or '-'"/>
+            <t t-set="date_to" t-value="state.filters.date_to or '-'"/>
+
+            <!-- ===================================================== -->
+            <!-- ✅ KPI TILE ROW (RESTORED - UNCHANGED)                 -->
+            <!-- ===================================================== -->
+            <div class="tm_kpi_row">
+
+              <div class="tm_tile tm_tile_green"
+                   role="button" tabindex="0"
+                   t-on-click="() => openOrders([])">
+                <div class="tm_tile_head">
+                  <div class="tm_tile_title">
+                    <i class="fa fa-list-alt me-2"></i>Total Orders
+                  </div>
+                  <div class="tm_tile_date">
+                    <t t-esc="date_from"/> → <t t-esc="date_to"/>
+                  </div>
+                </div>
+                <div class="tm_tile_value">
+                  <a href="#" t-on-click.stop.prevent="() => openOrders([])">
+                    <t t-esc="k.total_orders"/>
+                  </a>
+
+                  <div class="tm_kpi_trend"
+                       t-att-class="
+                         (k.total_orders_trend or 0) &gt; 0 ? 'tm_trend_up' :
+                         (k.total_orders_trend or 0) &lt; 0 ? 'tm_trend_down' :
+                         'tm_trend_neutral'
+                       ">
+                    <t t-if="(k.total_orders_trend or 0) &gt; 0">↑</t>
+                    <t t-if="(k.total_orders_trend or 0) &lt; 0">↓</t>
+                    <t t-if="(k.total_orders_trend or 0) == 0">—</t>
+                    <span><t t-esc="Math.abs(k.total_orders_trend or 0)"/>%</span>
+                  </div>
+                </div>
+                <div class="tm_tile_foot">
+                  <i class="fa fa-th-large me-2"></i>Summary of orders
+                </div>
+              </div>
+
+              <div class="tm_tile tm_tile_orange"
+                   role="button" tabindex="0"
+                   t-on-click="() => openOrders([['status','in',['confirmed','cutting','sewing','qc','ready_delivery']]])">
+                <div class="tm_tile_head">
+                  <div class="tm_tile_title">
+                    <i class="fa fa-spinner me-2"></i>Active Orders
+                  </div>
+                  <div class="tm_tile_date">
+                    <t t-esc="date_from"/> → <t t-esc="date_to"/>
+                  </div>
+                </div>
+                <div class="tm_tile_value">
+                  <a href="#" t-on-click.stop.prevent="() => openOrders([['status','in',['confirmed','cutting','sewing','qc','ready_delivery']]])">
+                    <t t-esc="k.active_orders"/>
+                  </a>
+
+                  <div class="tm_kpi_trend"
+                       t-att-class="
+                         (k.active_orders_trend or 0) &gt; 0 ? 'tm_trend_up' :
+                         (k.active_orders_trend or 0) &lt; 0 ? 'tm_trend_down' :
+                         'tm_trend_neutral'
+                       ">
+                    <t t-if="(k.active_orders_trend or 0) &gt; 0">↑</t>
+                    <t t-if="(k.active_orders_trend or 0) &lt; 0">↓</t>
+                    <t t-if="(k.active_orders_trend or 0) == 0">—</t>
+                    <span><t t-esc="Math.abs(k.active_orders_trend or 0)"/>%</span>
+                  </div>
+                </div>
+                <div class="tm_tile_foot">
+                  <i class="fa fa-cogs me-2"></i>In progress
+                </div>
+              </div>
+
+              <div class="tm_tile tm_tile_red"
+                   role="button" tabindex="0"
+                   t-on-click="() => openOrders([['status','=','delivered']])">
+                <div class="tm_tile_head">
+                  <div class="tm_tile_title">
+                    <i class="fa fa-truck me-2"></i>Delivered
+                  </div>
+                  <div class="tm_tile_date">
+                    <t t-esc="date_from"/> → <t t-esc="date_to"/>
+                  </div>
+                </div>
+                <div class="tm_tile_value">
+                  <a href="#" t-on-click.stop.prevent="() => openOrders([['status','=','delivered']])">
+                    <t t-esc="k.delivered_orders"/>
+                  </a>
+
+                  <div class="tm_kpi_trend"
+                       t-att-class="
+                         (k.delivered_orders_trend or 0) &gt; 0 ? 'tm_trend_up' :
+                         (k.delivered_orders_trend or 0) &lt; 0 ? 'tm_trend_down' :
+                         'tm_trend_neutral'
+                       ">
+                    <t t-if="(k.delivered_orders_trend or 0) &gt; 0">↑</t>
+                    <t t-if="(k.delivered_orders_trend or 0) &lt; 0">↓</t>
+                    <t t-if="(k.delivered_orders_trend or 0) == 0">—</t>
+                    <span><t t-esc="Math.abs(k.delivered_orders_trend or 0)"/>%</span>
+                  </div>
+                </div>
+                <div class="tm_tile_foot">
+                  <i class="fa fa-check-circle me-2"></i>On-time: <t t-esc="k.on_time_pct"/>%
+                </div>
+              </div>
+
+              <!-- ✅ QC Pass Rate NOT clickable -->
+              <div class="tm_tile tm_tile_blue">
+                <div class="tm_tile_head">
+                  <div class="tm_tile_title">
+                    <i class="fa fa-shield me-2"></i>QC Pass Rate
+                  </div>
+                  <div class="tm_tile_date">
+                    <t t-esc="date_from"/> → <t t-esc="date_to"/>
+                  </div>
+                </div>
+                <div class="tm_tile_value">
+                  <t t-esc="k.qc_pass_rate"/>%
+
+                  <div class="tm_kpi_trend"
+                       t-att-class="
+                         (k.qc_pass_rate_trend or 0) &gt; 0 ? 'tm_trend_up' :
+                         (k.qc_pass_rate_trend or 0) &lt; 0 ? 'tm_trend_down' :
+                         'tm_trend_neutral'
+                       ">
+                    <t t-if="(k.qc_pass_rate_trend or 0) &gt; 0">↑</t>
+                    <t t-if="(k.qc_pass_rate_trend or 0) &lt; 0">↓</t>
+                    <t t-if="(k.qc_pass_rate_trend or 0) == 0">—</t>
+                    <span><t t-esc="Math.abs(k.qc_pass_rate_trend or 0)"/>%</span>
+                  </div>
+                </div>
+                <div class="tm_tile_foot">
+                  <i class="fa fa-clock-o me-2"></i>Avg lead: <t t-esc="k.avg_lead_days"/> days
+                </div>
+              </div>
+
+            </div>
+
+            <!-- ===================================================== -->
+            <!-- ✅ SECOND KPI SMALL ROW (RESTORED - UNCHANGED)         -->
+            <!-- ===================================================== -->
+            <div class="tm_kpi_row tm_kpi_row_3">
+              <div class="tm_cardbox">
+                <div class="tm_cardbox_title">
+                  <i class="fa fa-money me-2"></i>Total Revenue
+                </div>
+                <div class="tm_cardbox_value">
+                  <t t-esc="k.total_revenue"/>
+                  <div class="tm_kpi_trend"
+                       t-att-class="
+                         (k.total_revenue_trend or 0) &gt; 0 ? 'tm_trend_up' :
+                         (k.total_revenue_trend or 0) &lt; 0 ? 'tm_trend_down' :
+                         'tm_trend_neutral'
+                       ">
+                    <t t-if="(k.total_revenue_trend or 0) &gt; 0">↑</t>
+                    <t t-if="(k.total_revenue_trend or 0) &lt; 0">↓</t>
+                    <t t-if="(k.total_revenue_trend or 0) == 0">—</t>
+                    <span><t t-esc="Math.abs(k.total_revenue_trend or 0)"/>%</span>
+                  </div>
+                </div>
+                <div class="tm_cardbox_sub">VAT: <t t-esc="k.total_vat"/></div>
+              </div>
+
+              <div class="tm_cardbox">
+                <div class="tm_cardbox_title">
+                  <i class="fa fa-credit-card me-2"></i>Balance Due
+                </div>
+                <div class="tm_cardbox_value">
+                  <t t-esc="k.total_balance_due"/>
+                  <div class="tm_kpi_trend"
+                       t-att-class="
+                         (k.total_balance_due_trend or 0) &gt; 0 ? 'tm_trend_up' :
+                         (k.total_balance_due_trend or 0) &lt; 0 ? 'tm_trend_down' :
+                         'tm_trend_neutral'
+                       ">
+                    <t t-if="(k.total_balance_due_trend or 0) &gt; 0">↑</t>
+                    <t t-if="(k.total_balance_due_trend or 0) &lt; 0">↓</t>
+                    <t t-if="(k.total_balance_due_trend or 0) == 0">—</t>
+                    <span><t t-esc="Math.abs(k.total_balance_due_trend or 0)"/>%</span>
+                  </div>
+                </div>
+                <div class="tm_cardbox_sub">Ready for delivery: <t t-esc="k.ready_delivery_orders"/></div>
+              </div>
+
+              <!-- ✅ Missing Required Docs clickable -->
+              <div class="tm_cardbox"
+                   role="button" tabindex="0"
+                   t-on-click="openMissingDocs">
+                <div class="tm_cardbox_title">
+                  <i class="fa fa-exclamation-triangle me-2"></i>Missing Required Docs
+                </div>
+                <div class="tm_cardbox_value">
+                  <a href="#" t-on-click.stop.prevent="openMissingDocs">
+                    <t t-esc="k.missing_docs"/>
+                  </a>
+                  <div class="tm_kpi_trend"
+                       t-att-class="
+                         (k.missing_docs_trend or 0) &gt; 0 ? 'tm_trend_up' :
+                         (k.missing_docs_trend or 0) &lt; 0 ? 'tm_trend_down' :
+                         'tm_trend_neutral'
+                       ">
+                    <t t-if="(k.missing_docs_trend or 0) &gt; 0">↑</t>
+                    <t t-if="(k.missing_docs_trend or 0) &lt; 0">↓</t>
+                    <t t-if="(k.missing_docs_trend or 0) == 0">—</t>
+                    <span><t t-esc="Math.abs(k.missing_docs_trend or 0)"/>%</span>
+                  </div>
+                </div>
+                <div class="tm_cardbox_sub">
+                  Accessories qty: <t t-esc="k.accessory_qty"/> | Fabric m: <t t-esc="k.fabric_m"/>
+                </div>
+              </div>
+            </div>
+
+            <!-- ===================================================== -->
+            <!-- ✅ PROFITABILITY KPI ROW (RESTORED - UNCHANGED)        -->
+            <!-- ===================================================== -->
+            <div class="tm_kpi_row tm_kpi_row_3">
+              <div class="tm_cardbox">
+                <div class="tm_cardbox_title">
+                  <i class="fa fa-scissors me-2"></i>Fabric Cost
+                </div>
+                <div class="tm_cardbox_value">
+                  <t t-esc="k.fabric_cost_total"/>
+                  <div class="tm_kpi_trend"
+                       t-att-class="
+                         (k.fabric_cost_total_trend or 0) &gt; 0 ? 'tm_trend_up' :
+                         (k.fabric_cost_total_trend or 0) &lt; 0 ? 'tm_trend_down' :
+                         'tm_trend_neutral'
+                       ">
+                    <t t-if="(k.fabric_cost_total_trend or 0) &gt; 0">↑</t>
+                    <t t-if="(k.fabric_cost_total_trend or 0) &lt; 0">↓</t>
+                    <t t-if="(k.fabric_cost_total_trend or 0) == 0">—</t>
+                    <span><t t-esc="Math.abs(k.fabric_cost_total_trend or 0)"/>%</span>
+                  </div>
+                </div>
+                <div class="tm_cardbox_sub">
+                  <t t-esc="date_from"/> → <t t-esc="date_to"/>
+                </div>
+              </div>
+
+              <div class="tm_cardbox">
+                <div class="tm_cardbox_title">
+                  <i class="fa fa-bar-chart me-2"></i>Gross Profit
+                </div>
+                <div class="tm_cardbox_value">
+                  <t t-esc="k.gross_profit"/>
+                  <div class="tm_kpi_trend"
+                       t-att-class="
+                         (k.gross_profit_trend or 0) &gt; 0 ? 'tm_trend_up' :
+                         (k.gross_profit_trend or 0) &lt; 0 ? 'tm_trend_down' :
+                         'tm_trend_neutral'
+                       ">
+                    <t t-if="(k.gross_profit_trend or 0) &gt; 0">↑</t>
+                    <t t-if="(k.gross_profit_trend or 0) &lt; 0">↓</t>
+                    <t t-if="(k.gross_profit_trend or 0) == 0">—</t>
+                    <span><t t-esc="Math.abs(k.gross_profit_trend or 0)"/>%</span>
+                  </div>
+                </div>
+                <div class="tm_cardbox_sub">Revenue - Fabric Cost</div>
+              </div>
+
+              <div class="tm_cardbox">
+                <div class="tm_cardbox_title">
+                  <i class="fa fa-percent me-2"></i>Profit Margin
+                </div>
+                <div class="tm_cardbox_value">
+                  <t t-esc="k.profit_margin_pct"/>%
+                  <div class="tm_kpi_trend"
+                       t-att-class="
+                         (k.profit_margin_pct_trend or 0) &gt; 0 ? 'tm_trend_up' :
+                         (k.profit_margin_pct_trend or 0) &lt; 0 ? 'tm_trend_down' :
+                         'tm_trend_neutral'
+                       ">
+                    <t t-if="(k.profit_margin_pct_trend or 0) &gt; 0">↑</t>
+                    <t t-if="(k.profit_margin_pct_trend or 0) &lt; 0">↓</t>
+                    <t t-if="(k.profit_margin_pct_trend or 0) == 0">—</t>
+                    <span><t t-esc="Math.abs(k.profit_margin_pct_trend or 0)"/>%</span>
+                  </div>
+                </div>
+                <div class="tm_cardbox_sub">Avg Order: <t t-esc="k.avg_order_value"/></div>
+              </div>
+            </div>
+
+            <!-- ===================================================== -->
+            <!-- ✅ CHART GRID (ADDED GRAPH MODE IN MANY PLACES)        -->
+            <!-- ===================================================== -->
+            <div class="tm_grid">
+
+              <!-- Orders by Status -->
+              <div class="tm_panel tm_chart_card">
+                <div class="tm_panel_title tm_chart_header">
+                  <div><i class="fa fa-pie-chart me-2"></i>Orders by Status</div>
+                  <div class="tm_chart_tools">
+                    <div class="tm_view_pills">
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.orders_by_status === 'table' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('orders_by_status','table')">Table</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.orders_by_status === 'donut' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('orders_by_status','donut')">Donut</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.orders_by_status === 'bar' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('orders_by_status','bar')">Bar</button>
+                    </div>
+                  </div>
+                </div>
+
+                <t t-if="state.ui.chart_view.orders_by_status !== 'table'">
+                  <div class="tm_chart_canvas_wrap">
+                    <canvas t-ref="ordersByStatusCanvas" class="tm_chart_canvas"></canvas>
+                  </div>
+                </t>
+
+                <t t-if="state.ui.chart_view.orders_by_status === 'table'">
+                  <table class="table table-sm mb-0">
+                    <tbody>
+                      <t t-foreach="state.data.charts.orders_by_status" t-as="r" t-key="r.label">
+                        <tr>
+                          <td><t t-esc="r.label"/></td>
+                          <td class="text-end"><t t-esc="r.value"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </t>
+              </div>
+
+              <!-- Top Tailors -->
+              <div class="tm_panel tm_chart_card">
+                <div class="tm_panel_title tm_chart_header">
+                  <div><i class="fa fa-user me-2"></i>Top Tailors (Workload)</div>
+                  <div class="tm_chart_tools">
+                    <div class="tm_view_pills">
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.top_tailors === 'table' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('top_tailors','table')">Table</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.top_tailors === 'bar' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('top_tailors','bar')">Bar</button>
+                    </div>
+                  </div>
+                </div>
+
+                <t t-if="state.ui.chart_view.top_tailors !== 'table'">
+                  <div class="tm_chart_canvas_wrap">
+                    <canvas t-ref="topTailorsCanvas" class="tm_chart_canvas"></canvas>
+                  </div>
+                </t>
+
+                <t t-if="state.ui.chart_view.top_tailors === 'table'">
+                  <table class="table table-sm mb-0">
+                    <tbody>
+                      <t t-foreach="state.data.charts.top_tailors" t-as="trow" t-key="trow.label">
+                        <tr>
+                          <td><t t-esc="trow.label"/></td>
+                          <td class="text-end"><t t-esc="trow.value"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </t>
+              </div>
+
+              <!-- Orders Trend -->
+              <div class="tm_panel tm_chart_card">
+                <div class="tm_panel_title tm_chart_header">
+                  <div><i class="fa fa-line-chart me-2"></i>Orders Trend (by Month)</div>
+                  <div class="tm_chart_tools">
+                    <div class="tm_view_pills">
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.orders_by_month === 'table' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('orders_by_month','table')">Table</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.orders_by_month === 'line' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('orders_by_month','line')">Line</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.orders_by_month === 'bar' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('orders_by_month','bar')">Bar</button>
+                    </div>
+                  </div>
+                </div>
+
+                <t t-if="state.ui.chart_view.orders_by_month !== 'table'">
+                  <div class="tm_chart_canvas_wrap">
+                    <canvas t-ref="ordersByMonthCanvas" class="tm_chart_canvas"></canvas>
+                  </div>
+                </t>
+
+                <t t-if="state.ui.chart_view.orders_by_month === 'table'">
+                  <table class="table table-sm mb-0">
+                    <tbody>
+                      <t t-foreach="state.data.charts.orders_by_month" t-as="m" t-key="m.label">
+                        <tr>
+                          <td><t t-esc="m.label"/></td>
+                          <td class="text-end"><t t-esc="m.value"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </t>
+              </div>
+
+              <!-- Revenue Trend -->
+              <div class="tm_panel tm_chart_card">
+                <div class="tm_panel_title tm_chart_header">
+                  <div><i class="fa fa-line-chart me-2"></i>Revenue Trend (by Month)</div>
+                  <div class="tm_chart_tools">
+                    <div class="tm_view_pills">
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.revenue_by_month === 'table' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('revenue_by_month','table')">Table</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.revenue_by_month === 'line' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('revenue_by_month','line')">Line</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.revenue_by_month === 'area' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('revenue_by_month','area')">Area</button>
+                    </div>
+                  </div>
+                </div>
+
+                <t t-if="state.ui.chart_view.revenue_by_month !== 'table'">
+                  <div class="tm_chart_canvas_wrap">
+                    <canvas t-ref="revenueByMonthCanvas" class="tm_chart_canvas"></canvas>
+                  </div>
+                </t>
+
+                <t t-if="state.ui.chart_view.revenue_by_month === 'table'">
+                  <table class="table table-sm mb-0">
+                    <tbody>
+                      <t t-foreach="state.data.charts.revenue_by_month" t-as="rm" t-key="rm.label">
+                        <tr>
+                          <td><t t-esc="rm.label"/></td>
+                          <td class="text-end"><t t-esc="rm.value"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </t>
+              </div>
+
+              <!-- Top Models -->
+              <div class="tm_panel tm_chart_card">
+                <div class="tm_panel_title tm_chart_header">
+                  <div><i class="fa fa-star me-2"></i>Top Selling Models</div>
+                  <div class="tm_chart_tools">
+                    <div class="tm_view_pills">
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.top_models === 'table' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('top_models','table')">Table</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.top_models === 'bar' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('top_models','bar')">Bar</button>
+                    </div>
+                  </div>
+                </div>
+
+                <t t-if="state.ui.chart_view.top_models !== 'table'">
+                  <div class="tm_chart_canvas_wrap">
+                    <canvas t-ref="topModelsCanvas" class="tm_chart_canvas"></canvas>
+                  </div>
+                </t>
+
+                <t t-if="state.ui.chart_view.top_models === 'table'">
+                  <table class="table table-sm mb-0">
+                    <tbody>
+                      <t t-foreach="state.data.charts.top_models" t-as="mm" t-key="mm.label">
+                        <tr>
+                          <td><t t-esc="mm.label"/></td>
+                          <td class="text-end"><t t-esc="mm.value"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </t>
+              </div>
+
+              <!-- Top Fabrics -->
+              <div class="tm_panel tm_chart_card">
+                <div class="tm_panel_title tm_chart_header">
+                  <div><i class="fa fa-tags me-2"></i>Top Selling Fabrics</div>
+                  <div class="tm_chart_tools">
+                    <div class="tm_view_pills">
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.top_fabrics === 'table' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('top_fabrics','table')">Table</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.top_fabrics === 'bar' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('top_fabrics','bar')">Bar</button>
+                    </div>
+                  </div>
+                </div>
+
+                <t t-if="state.ui.chart_view.top_fabrics !== 'table'">
+                  <div class="tm_chart_canvas_wrap">
+                    <canvas t-ref="topFabricsCanvas" class="tm_chart_canvas"></canvas>
+                  </div>
+                </t>
+
+                <t t-if="state.ui.chart_view.top_fabrics === 'table'">
+                  <table class="table table-sm mb-0">
+                    <tbody>
+                      <t t-foreach="state.data.charts.top_fabrics" t-as="ff" t-key="ff.label">
+                        <tr>
+                          <td><t t-esc="ff.label"/></td>
+                          <td class="text-end"><t t-esc="ff.value"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </t>
+              </div>
+
+              <!-- Revenue vs Cost vs Profit -->
+              <div class="tm_panel tm_panel_full tm_chart_card">
+                <div class="tm_panel_title tm_chart_header">
+                  <div><i class="fa fa-balance-scale me-2"></i>Revenue vs Fabric Cost vs Profit (by Month)</div>
+                  <div class="tm_chart_tools">
+                    <div class="tm_view_pills">
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.rev_cost_profit_by_month === 'table' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('rev_cost_profit_by_month','table')">Table</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.rev_cost_profit_by_month === 'line' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('rev_cost_profit_by_month','line')">Line</button>
+                    </div>
+                  </div>
+                </div>
+
+                <t t-if="state.ui.chart_view.rev_cost_profit_by_month !== 'table'">
+                  <div class="tm_chart_canvas_wrap">
+                    <canvas t-ref="revCostProfitCanvas" class="tm_chart_canvas"></canvas>
+                  </div>
+                </t>
+
+                <t t-if="state.ui.chart_view.rev_cost_profit_by_month === 'table'">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr>
+                        <th>Month</th>
+                        <th class="text-end">Revenue</th>
+                        <th class="text-end">Fabric Cost</th>
+                        <th class="text-end">Profit</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="state.data.charts.rev_cost_profit_by_month" t-as="rcp" t-key="rcp.label">
+                        <tr>
+                          <td><t t-esc="rcp.label"/></td>
+                          <td class="text-end"><t t-esc="rcp.revenue"/></td>
+                          <td class="text-end"><t t-esc="rcp.fabric_cost"/></td>
+                          <td class="text-end"><t t-esc="rcp.profit"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </t>
+              </div>
+
+              <!-- Missing Docs by Type -->
+              <div class="tm_panel tm_panel_full tm_chart_card">
+                <div class="tm_panel_title tm_chart_header">
+                  <div><i class="fa fa-times-circle me-2"></i>Missing Docs by Type</div>
+                  <div class="tm_chart_tools">
+                    <div class="tm_view_pills">
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.missing_docs_by_type === 'table' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('missing_docs_by_type','table')">Table</button>
+                      <button class="tm_pill"
+                        t-att-class="state.ui.chart_view.missing_docs_by_type === 'bar' ? 'tm_pill active' : 'tm_pill'"
+                        t-on-click="() => setChartView('missing_docs_by_type','bar')">Bar</button>
+                    </div>
+                  </div>
+                </div>
+
+                <t t-if="state.ui.chart_view.missing_docs_by_type !== 'table'">
+                  <div class="tm_chart_canvas_wrap">
+                    <canvas t-ref="missingDocsTypeCanvas" class="tm_chart_canvas"></canvas>
+                  </div>
+                </t>
+
+                <t t-if="state.ui.chart_view.missing_docs_by_type === 'table'">
+                  <table class="table table-sm mb-0">
+                    <tbody>
+                      <t t-foreach="state.data.charts.missing_docs_by_type" t-as="d" t-key="d.label">
+                        <tr>
+                          <td><t t-esc="d.label"/></td>
+                          <td class="text-end"><t t-esc="d.value"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </t>
+              </div>
+
+            </div>
+
+          </t>
+        </div>
+
+        <!-- RIGHT SIDEBAR -->
+        <aside class="tm_sidebar">
+          <div class="tm_sidebar_title">
+            <i class="fa fa-credit-card me-2"></i>Sales
+          </div>
+          <ul class="tm_side_list">
+            <li>
+              <a href="#" t-on-click.prevent="() => openOrders([])">
+                <i class="fa fa-shopping-basket me-2"></i>Orders
+              </a>
+            </li>
+            <li>
+              <a href="#" t-on-click.prevent="openMissingDocs">
+                <i class="fa fa-exclamation-triangle me-2"></i>Missing Docs
+              </a>
+            </li>
+            <li>
+              <a href="#" t-on-click.prevent="() => openOrders([['status','=','ready_delivery']])">
+                <i class="fa fa-truck me-2"></i>Ready Delivery
+              </a>
+            </li>
+            <li>
+              <a href="#" t-on-click.prevent="() => openOrders([['status','=','delivered']])">
+                <i class="fa fa-check-circle me-2"></i>Delivered
+              </a>
+            </li>
+          </ul>
+        </aside>
+
+      </div>
+    </div>
+  </t>
+
+</templates>

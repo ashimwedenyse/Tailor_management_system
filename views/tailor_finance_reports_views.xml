@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+
+    <!-- ========================================================= -->
+    <!-- FINANCE ROOT MENU                                          -->
+    <!-- ========================================================= -->
+    <menuitem id="menu_tailor_finance_root"
+              name="Finance"
+              parent="tailor_management.menu_tailor_root"
+              sequence="80"
+              groups="tailor_management.group_tailor_admin,tailor_management.group_tailor_sales"/>
+
+    <!-- ========================================================= -->
+    <!-- VAT REPORT: list + PIVOT + GRAPH + ACTION + MENU           -->
+    <!-- ========================================================= -->
+    <record id="view_tailor_vat_report_list" model="ir.ui.view">
+      <field name="name">tailor.vat.report.list</field>
+      <field name="model">tailor.vat.report</field>
+      <field name="arch" type="xml">
+        <list string="VAT Report" create="0" edit="0" delete="0">
+          <field name="invoice_name"/>
+          <field name="partner_id" string="Customer"/>
+          <field name="invoice_date"/>
+          <field name="invoice_date_due"/>
+          <field name="amount_untaxed" sum="Untaxed"/>
+          <field name="amount_tax" sum="VAT"/>
+          <field name="amount_total" sum="Total"/>
+        </list>
+      </field>
+    </record>
+
+    <record id="view_tailor_vat_report_pivot" model="ir.ui.view">
+      <field name="name">tailor.vat.report.pivot</field>
+      <field name="model">tailor.vat.report</field>
+      <field name="arch" type="xml">
+        <pivot string="VAT Analysis">
+          <field name="company_id" type="row"/>
+          <field name="invoice_date" interval="month" type="col"/>
+          <field name="amount_untaxed" type="measure"/>
+          <field name="amount_tax" type="measure"/>
+          <field name="amount_total" type="measure"/>
+        </pivot>
+      </field>
+    </record>
+
+    <record id="view_tailor_vat_report_graph" model="ir.ui.view">
+      <field name="name">tailor.vat.report.graph</field>
+      <field name="model">tailor.vat.report</field>
+      <field name="arch" type="xml">
+        <graph string="VAT Analysis" type="bar">
+          <field name="invoice_date" interval="month" type="row"/>
+          <field name="amount_untaxed" type="measure"/>
+          <field name="amount_tax" type="measure"/>
+          <field name="amount_total" type="measure"/>
+        </graph>
+      </field>
+    </record>
+
+    <record id="action_tailor_vat_report" model="ir.actions.act_window">
+      <field name="name">VAT Report</field>
+      <field name="res_model">tailor.vat.report</field>
+      <field name="view_mode">list,pivot,graph</field>
+      <field name="context">{}</field>
+    </record>
+
+    <menuitem id="menu_tailor_vat_report"
+              name="VAT Report"
+              parent="menu_tailor_finance_root"
+              action="action_tailor_vat_report"
+              sequence="10"
+              groups="tailor_management.group_tailor_admin,tailor_management.group_tailor_sales"/>
+
+    <!-- ========================================================= -->
+    <!-- AGING RECEIVABLES: list + PIVOT + GRAPH + ACTION + MENU    -->
+    <!-- ========================================================= -->
+    <record id="view_tailor_aging_receivable_list" model="ir.ui.view">
+      <field name="name">tailor.aging.receivable.report.list</field>
+      <field name="model">tailor.aging.receivable.report</field>
+      <field name="arch" type="xml">
+        <list string="Aging Receivables" create="0" edit="0" delete="0">
+          <field name="invoice_name"/>
+          <field name="partner_id" string="Customer"/>
+          <field name="invoice_date"/>
+          <field name="invoice_date_due"/>
+          <field name="days_overdue"/>
+          <field name="bucket"/>
+          <field name="amount_total" sum="Invoiced"/>
+          <field name="amount_residual" sum="Outstanding"/>
+        </list>
+      </field>
+    </record>
+
+    <record id="view_tailor_aging_receivable_pivot" model="ir.ui.view">
+      <field name="name">tailor.aging.receivable.report.pivot</field>
+      <field name="model">tailor.aging.receivable.report</field>
+      <field name="arch" type="xml">
+        <pivot string="Aging Analysis">
+          <field name="company_id" type="row"/>
+          <field name="customer" type="row"/>
+          <field name="amount_residual" type="measure"/>
+          <field name="not_due" type="measure"/>
+          <field name="b0_30" type="measure"/>
+          <field name="b31_60" type="measure"/>
+          <field name="b61_90" type="measure"/>
+          <field name="b90p" type="measure"/>
+        </pivot>
+      </field>
+    </record>
+
+    <record id="view_tailor_aging_receivable_graph" model="ir.ui.view">
+      <field name="name">tailor.aging.receivable.report.graph</field>
+      <field name="model">tailor.aging.receivable.report</field>
+      <field name="arch" type="xml">
+        <graph string="Aging Analysis" type="bar">
+          <field name="bucket" type="row"/>
+          <field name="amount_residual" type="measure"/>
+          <field name="not_due" type="measure"/>
+          <field name="b0_30" type="measure"/>
+          <field name="b31_60" type="measure"/>
+          <field name="b61_90" type="measure"/>
+          <field name="b90p" type="measure"/>
+        </graph>
+      </field>
+    </record>
+
+    <record id="action_tailor_aging_receivable" model="ir.actions.act_window">
+      <field name="name">Aging Receivables</field>
+      <field name="res_model">tailor.aging.receivable.report</field>
+      <field name="view_mode">list,pivot,graph</field>
+      <field name="context">{}</field>
+    </record>
+
+    <menuitem id="menu_tailor_aging_receivable"
+              name="Aging Receivables"
+              parent="menu_tailor_finance_root"
+              action="action_tailor_aging_receivable"
+              sequence="20"
+              groups="tailor_management.group_tailor_admin,tailor_management.group_tailor_sales"/>
+
+    <!-- ========================================================= -->
+    <!-- COGS REPORT: list + PIVOT + GRAPH + ACTION + MENU          -->
+    <!-- ========================================================= -->
+    <record id="view_tailor_cogs_report_list" model="ir.ui.view">
+      <field name="name">tailor.cogs.report.list</field>
+      <field name="model">tailor.cogs.report</field>
+      <field name="arch" type="xml">
+        <list string="COGS Report" create="0" edit="0" delete="0">
+          <field name="order_name" string="Order Reference"/>
+          <field name="partner_id" string="Customer"/>
+          <field name="order_date"/>
+          <field name="status"/>
+          <field name="sale_amount" sum="Sale Amount"/>
+          <field name="fabric_cost" sum="Total Fabric"/>
+          <field name="overhead_cost" sum="Overhead"/>
+          <field name="total_cogs" sum="Total COGS"/>
+          <field name="gross_profit" sum="Gross Profit"/>
+        </list>
+      </field>
+    </record>
+
+    <record id="view_tailor_cogs_report_pivot" model="ir.ui.view">
+      <field name="name">tailor.cogs.report.pivot</field>
+      <field name="model">tailor.cogs.report</field>
+      <field name="arch" type="xml">
+        <pivot string="COGS Analysis">
+          <field name="company_id" type="row"/>
+          <field name="status" type="row"/>
+          <field name="order_date" interval="month" type="col"/>
+          <field name="sale_amount" type="measure"/>
+          <field name="fabric_cost" type="measure"/>
+          <field name="overhead_cost" type="measure"/>
+          <field name="total_cogs" type="measure"/>
+          <field name="gross_profit" type="measure"/>
+        </pivot>
+      </field>
+    </record>
+
+    <record id="view_tailor_cogs_report_graph" model="ir.ui.view">
+      <field name="name">tailor.cogs.report.graph</field>
+      <field name="model">tailor.cogs.report</field>
+      <field name="arch" type="xml">
+        <graph string="COGS Analysis" type="bar">
+          <field name="order_date" interval="month" type="row"/>
+          <field name="sale_amount" type="measure"/>
+          <field name="fabric_cost" type="measure"/>
+          <field name="overhead_cost" type="measure"/>
+          <field name="total_cogs" type="measure"/>
+          <field name="gross_profit" type="measure"/>
+        </graph>
+      </field>
+    </record>
+
+    <record id="action_tailor_cogs_report" model="ir.actions.act_window">
+      <field name="name">COGS Report</field>
+      <field name="res_model">tailor.cogs.report</field>
+      <field name="view_mode">list,pivot,graph</field>
+      <field name="context">{}</field>
+    </record>
+
+    <menuitem id="menu_tailor_cogs_report"
+              name="COGS Report"
+              parent="menu_tailor_finance_root"
+              action="action_tailor_cogs_report"
+              sequence="30"
+              groups="tailor_management.group_tailor_admin,tailor_management.group_tailor_sales"/>
+
+  </data>
+</odoo>

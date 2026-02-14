@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- ========================================================= -->
+    <!-- Admin: ALL documents (but NO delete)                       -->
+    <!-- ========================================================= -->
+    <record id="rule_docs_admin_all" model="ir.rule">
+        <field name="name">Documents: Admin all</field>
+        <field name="model_id" ref="model_customer_documents"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('tailor_management.group_tailor_admin'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- Sales: READ all docs of orders THEY created (avoids error) -->
+    <!-- ========================================================= -->
+    <record id="rule_docs_sales_read_own_order_docs" model="ir.rule">
+        <field name="name">Documents: Sales read own Tailor Order docs</field>
+        <field name="model_id" ref="model_customer_documents"/>
+        <!-- ✅ This prevents the Access Error when Tailor Order loads/saves -->
+        <field name="domain_force">[('tailor_order_id.create_uid', '=', user.id)]</field>
+        <field name="groups" eval="[(4, ref('tailor_management.group_tailor_sales'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="0"/>
+        <field name="perm_create" eval="0"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- Sales: CREATE/WRITE only INVOICE docs                      -->
+    <!-- ========================================================= -->
+    <record id="rule_docs_sales_write_create_invoice_only" model="ir.rule">
+        <field name="name">Documents: Sales write/create invoice only</field>
+        <field name="model_id" ref="model_customer_documents"/>
+        <field name="domain_force">[('document_type','=','invoice')]</field>
+        <field name="groups" eval="[(4, ref('tailor_management.group_tailor_sales'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- Tailor: ONLY measurements                                  -->
+    <!-- ========================================================= -->
+    <record id="rule_docs_tailor_measurement_only" model="ir.rule">
+        <field name="name">Documents: Tailor measurement only</field>
+        <field name="model_id" ref="model_customer_documents"/>
+        <field name="domain_force">[('document_type','=','measurement')]</field>
+        <field name="groups" eval="[(4, ref('tailor_management.group_tailor_tailor'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- QC: ONLY measurements                                      -->
+    <!-- ========================================================= -->
+    <record id="rule_docs_qc_measurement_only" model="ir.rule">
+        <field name="name">Documents: QC measurement only</field>
+        <field name="model_id" ref="model_customer_documents"/>
+        <field name="domain_force">[('document_type','=','measurement')]</field>
+        <field name="groups" eval="[(4, ref('tailor_management.group_tailor_qc'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- Portal: own invoice/contract only                          -->
+    <!-- ========================================================= -->
+    <record id="rule_docs_portal_own_invoice_contract" model="ir.rule">
+        <field name="name">Documents: Portal own invoice/contract only</field>
+        <field name="model_id" ref="model_customer_documents"/>
+        <field name="domain_force">
+            [
+              ('partner_id','child_of',[user.partner_id.commercial_partner_id.id]),
+              ('document_type','in',['invoice','contract'])
+            ]
+        </field>
+        <field name="groups" eval="[(4, ref('base.group_portal'))]"/>
+        <field name="perm_read" eval="1"/>
+        <field name="perm_write" eval="1"/>
+        <field name="perm_create" eval="1"/>
+        <field name="perm_unlink" eval="0"/>
+    </record>
+
+  </data>
+</odoo>

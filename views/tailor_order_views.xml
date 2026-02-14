@@ -1,0 +1,627 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- ========================================================= -->
+    <!-- LIST VIEW                                                  -->
+    <!-- ========================================================= -->
+    <record id="view_tailor_order_list" model="ir.ui.view">
+        <field name="name">tailor.order.list</field>
+        <field name="model">tailor.order</field>
+        <field name="arch" type="xml">
+            <list string="Tailor Orders"
+                  decoration-bf="status == 'delivered'"
+                  decoration-warning="status == 'ready_delivery'"
+                  decoration-info="status == 'sewing'"
+                  decoration-muted="status == 'cancel'">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="tailor_id"/>
+                <field name="product_id"/>
+                <field name="garment_template"/>
+                <field name="quantity"/>
+                <field name="status"/>
+                <field name="order_date"/>
+                <field name="delivery_date"/>
+
+                <field name="fabric_unit_cost" optional="show"/>
+                <field name="fabric_total_cost" optional="show"/>
+
+                <field name="sale_price" optional="hide"/>
+                <field name="fabric_cost" optional="hide"/>
+                <field name="overhead_cost" optional="hide"/>
+                <field name="cogs_total" optional="hide"/>
+                <field name="gross_profit" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- KANBAN VIEW                                                -->
+    <!-- ========================================================= -->
+    <record id="view_tailor_order_kanban" model="ir.ui.view">
+        <field name="name">tailor.order.kanban</field>
+        <field name="model">tailor.order</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" default_group_by="status">
+                <!-- preload fields used inside the template -->
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="tailor_id"/>
+                <field name="product_id"/>
+                <field name="garment_template"/>
+                <field name="quantity"/>
+                <field name="status"/>
+                <field name="order_date"/>
+                <field name="delivery_date"/>
+                <field name="customer_approved"/>
+                <field name="stock_checked"/>
+                <field name="admin_materials_approved"/>
+                <field name="qc_approved"/>
+
+                <templates>
+                    <!-- IMPORTANT: Odoo 17+ expects t-name="card" -->
+                    <t t-name="card">
+                        <div class="oe_kanban_card oe_kanban_global_click shadow-sm"
+                             style="border-radius:14px; overflow:hidden; border:1px solid rgba(255,255,255,.08);">
+
+                            <!-- ===== Top Header Bar ===== -->
+                            <div class="p-3"
+                                 style="background: rgba(255,255,255,.04); border-bottom:1px solid rgba(255,255,255,.08);">
+                                <div class="d-flex justify-content-between align-items-start gap-2">
+                                    <div class="min-w-0">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <i class="fa fa-scissors text-muted"/>
+                                            <strong class="text-truncate" style="font-size:15px;">
+                                                <field name="name"/>
+                                            </strong>
+                                        </div>
+                                        <div class="text-muted mt-1 text-truncate" style="font-size:12px;">
+                                            <i class="fa fa-user me-1"/> <field name="partner_id"/>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status pill -->
+                                    <div class="text-end">
+                                        <span class="badge text-bg-secondary"
+                                              style="border-radius:999px; padding:6px 10px;">
+                                            <field name="status"/>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- quick flags row -->
+                                <div class="mt-2 d-flex flex-wrap gap-1">
+                                    <t t-if="record.customer_approved and record.customer_approved.raw_value">
+                                        <span class="badge text-bg-primary" style="border-radius:999px;">Customer Approved</span>
+                                    </t>
+                                    <t t-if="record.stock_checked and record.stock_checked.raw_value">
+                                        <span class="badge text-bg-info" style="border-radius:999px;">Stock Checked</span>
+                                    </t>
+                                    <t t-if="record.admin_materials_approved and record.admin_materials_approved.raw_value">
+                                        <span class="badge text-bg-warning" style="border-radius:999px;">Materials Approved</span>
+                                    </t>
+                                    <t t-if="record.qc_approved and record.qc_approved.raw_value">
+                                        <span class="badge text-bg-success" style="border-radius:999px;">QC Approved</span>
+                                    </t>
+                                </div>
+                            </div>
+
+                            <!-- ===== Body ===== -->
+                            <div class="p-3">
+                                <div class="d-flex flex-column gap-2">
+
+                                    <div class="d-flex justify-content-between gap-2">
+                                        <div class="text-muted" style="font-size:12px;">
+                                            <i class="fa fa-cube me-1"/> Product
+                                        </div>
+                                        <div class="text-truncate" style="font-size:13px; max-width:60%;">
+                                            <field name="product_id"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between gap-2">
+                                        <div class="text-muted" style="font-size:12px;">
+                                            <i class="fa fa-tags me-1"/> Template
+                                        </div>
+                                        <div class="text-truncate" style="font-size:13px; max-width:60%;">
+                                            <field name="garment_template"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between gap-2">
+                                        <div class="text-muted" style="font-size:12px;">
+                                            <i class="fa fa-hashtag me-1"/> Quantity
+                                        </div>
+                                        <div style="font-size:13px;">
+                                            <strong><field name="quantity"/></strong>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-between gap-2">
+                                        <div class="text-muted" style="font-size:12px;">
+                                            <i class="fa fa-user-circle me-1"/> Tailor
+                                        </div>
+                                        <div class="text-truncate" style="font-size:13px; max-width:60%;">
+                                            <field name="tailor_id"/>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <!-- ===== Footer ===== -->
+                            <div class="px-3 py-2"
+                                 style="background: rgba(255,255,255,.03); border-top:1px solid rgba(255,255,255,.08);">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="text-muted" style="font-size:12px;">
+                                        <i class="fa fa-calendar me-1"/> <span class="me-1">Order:</span>
+                                        <span><field name="order_date"/></span>
+                                    </div>
+                                    <div class="text-muted" style="font-size:12px;">
+                                        <i class="fa fa-truck me-1"/> <span class="me-1">Delivery:</span>
+                                        <span><field name="delivery_date"/></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- FORM VIEW                                                  -->
+    <!-- ========================================================= -->
+    <record id="view_tailor_order_form" model="ir.ui.view">
+        <field name="name">tailor.order.form</field>
+        <field name="model">tailor.order</field>
+        <field name="arch" type="xml">
+            <form string="Tailor Order (UX+)" class="tm_tailor_order_form">
+
+                <!-- ================= Header (status + buttons) ================= -->
+                <header>
+                    <field name="status" widget="statusbar"
+                           statusbar_visible="draft,confirmed,cutting,sewing,qc,ready_delivery,delivered,cancel"/>
+
+                    <!-- ✅ Sales: customer approval only (does NOT unlock manufacturing) -->
+                    <button name="approve_order" type="object" string="Customer Approved"
+                            class="btn-primary"
+                            modifiers="{'invisible': [('status','!=','draft'),('customer_approved','=',True)]}"
+                            groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+
+                    <!-- ✅ Stock Manager/Admin: check availability + reserve + confirm -->
+                    <button name="action_check_and_confirm" type="object" string="Check Availability &amp; Confirm"
+                            class="btn-primary"
+                            groups="stock.group_stock_manager,tailor_management.group_tailor_admin"
+                            modifiers="{'invisible': [('status','!=','draft'),('customer_approved','=',False)]}"/>
+
+                    <!-- ✅ Admin/Manager: final materials approval before production -->
+                    <button name="action_admin_approve_materials" type="object" string="Approve Materials"
+                            class="btn-warning"
+                            groups="tailor_management.group_tailor_admin"
+                            modifiers="{'invisible': [('status','!=','confirmed'),('stock_checked','=',False),('admin_materials_approved','=',True)]}"/>
+
+                    <button name="action_set_done" type="object" string="Mark Delivered"
+                            class="btn-success"
+                            modifiers="{'invisible': [('status','!=','ready_delivery')]}"
+                            groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+
+                    <button name="action_set_cancelled" type="object" string="Cancel"
+                            class="btn-danger"
+                            modifiers="{'invisible': [('status','in',['delivered','cancel'])]}"
+                            groups="tailor_management.group_tailor_admin"/>
+
+                    <button name="unlock_measurements" type="object" string="Unlock Measurements"
+                            class="btn-warning"
+                            groups="tailor_management.group_tailor_admin,stock.group_stock_manager"
+                            modifiers="{'invisible': [('measurements_locked','=',False)]}"/>
+
+                    <button name="action_qc_approve" type="object" string="Approve QC"
+                            class="btn-success"
+                            groups="tailor_management.group_tailor_qc,tailor_management.group_tailor_admin"
+                            invisible="status != 'qc' or qc_approved"/>
+
+                    <div class="oe_inline" invisible="not qc_approved">
+                        <span class="badge text-bg-success">QC APPROVED</span>
+                    </div>
+
+                    <div class="oe_inline" invisible="not stock_checked">
+                        <span class="badge text-bg-info">STOCK CHECKED</span>
+                    </div>
+
+                    <div class="oe_inline" invisible="not admin_materials_approved">
+                        <span class="badge text-bg-warning">MATERIALS APPROVED</span>
+                    </div>
+
+                    <field name="measurements_locked" widget="boolean_toggle"
+                           modifiers="{'readonly': True}"/>
+
+                    <!-- hidden: used for visibility rules / gates -->
+                    <field name="stock_checked" invisible="1"/>
+                    <field name="admin_materials_approved" invisible="1"/>
+                </header>
+
+                <sheet>
+
+                    <!-- ✅ Premium ribbons -->
+                    <widget name="web_ribbon" title="DELIVERED" bg_color="bg-success"
+                            invisible="status != 'delivered'"/>
+                    <widget name="web_ribbon" title="CANCELLED" bg_color="bg-danger"
+                            invisible="status != 'cancel'"/>
+
+                    <!-- ✅ Premium smart buttons (top right area) -->
+                    <div class="oe_button_box" name="button_box">
+
+                        <button type="object" name="action_view_documents" class="oe_stat_button"
+                                icon="fa-folder-open">
+                            <field name="document_count" widget="statinfo" string="Documents"/>
+                        </button>
+
+                        <button type="object" name="action_view_mos" class="oe_stat_button"
+                                icon="fa-cogs">
+                            <field name="mo_count" widget="statinfo" string="MOs"/>
+                        </button>
+
+                        <button type="object" name="action_view_accessories" class="oe_stat_button"
+                                icon="fa-tags">
+                            <field name="accessory_count" widget="statinfo" string="Accessories"/>
+                        </button>
+
+                    </div>
+
+                    <!-- ✅ Title area (more premium) -->
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="TO/0001"/>
+                        </h1>
+                        <div class="text-muted" style="margin-top:6px;">
+                            <span><i class="fa fa-user me-1"/> <field name="customer_name" readonly="1"/></span>
+                            <span class="ms-3"><i class="fa fa-calendar me-1"/> <field name="order_date" readonly="1"/></span>
+                        </div>
+                    </div>
+
+                    <!-- ================= Top Summary ================= -->
+                    <group col="2">
+                        <group string="Customer &amp; Order Info">
+                            <field name="partner_id" required="1"
+                                   modifiers="{'readonly': [('status','!=','draft')]}"
+                                   groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                            <field name="tailor_id"
+                                   modifiers="{'readonly': [('status','!=','draft')]}"
+                                   groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                            <field name="product_id" required="1"
+                                   modifiers="{'readonly': [('status','!=','draft')]}"
+                                   groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                            <field name="quantity"
+                                   modifiers="{'readonly': [('status','!=','draft')]}"
+                                   groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                            <field name="garment_template" required="1"
+                                   modifiers="{'readonly': [('status','!=','draft')]}"
+                                   groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                            <field name="style_type"
+                                   modifiers="{'readonly': [('status','!=','draft')]}"
+                                   groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                            <field name="customer_approved" readonly="1"/>
+                            <field name="delivery_date"
+                                   modifiers="{'readonly': [('status','!=','draft')]}"
+                                   groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                        </group>
+
+                        <group string="Measurement Diagram">
+                            <field name="display_diagram" widget="image"
+                                   options="{'preview_image': 'display_diagram'}"/>
+                        </group>
+                    </group>
+
+                    <!-- ================= Tabs ================= -->
+                    <notebook>
+<page string="Overview">
+    <group col="4">
+        <group>
+            <field name="name" readonly="1"/>
+            <field name="partner_id"/>
+            <field name="status" readonly="1"/>
+        </group>
+        <group>
+            <field name="order_date"/>
+            <field name="delivery_date"/>
+            <field name="tailor_id"/>
+        </group>
+        <group>
+            <field name="product_id"/>
+            <field name="quantity"/>
+            <field name="fabric_type"/>
+        </group>
+        <group>
+            <field name="advance_payment_input"/>
+            <field name="balance" readonly="1"/>
+        </group>
+    </group>
+
+    <separator string="Approvals" colspan="4"/>
+    <group col="4">
+        <field name="customer_approved" readonly="1"/>
+        <field name="stock_checked" readonly="1"/>
+        <field name="admin_materials_approved" readonly="1"/>
+        <field name="qc_approved" readonly="1"/>
+    </group>
+</page>
+
+                        <page string="Measurements">
+                            <group col="2">
+
+                                <group string="Body Measurements"
+                                       modifiers="{'readonly': [('measurements_locked','=',True)]}">
+                                    <field name="length"/>
+                                    <field name="shoulder"/>
+                                    <field name="sleeve_length"/>
+                                    <field name="chest"/>
+                                    <field name="waist"/>
+                                    <field name="hip"/>
+                                    <field name="neck"/>
+                                    <field name="bottom_width"/>
+                                </group>
+
+                                <group string="Notes &amp; Instructions"
+                                       modifiers="{'readonly': [('measurements_locked','=',True)]}">
+                                    <field name="measurement_notes" placeholder="Special measurement instructions..."/>
+                                    <field name="style_preference" placeholder="Customer style preference..."/>
+                                    <field name="fitting_style" placeholder="Example: Slim / Regular / Loose"/>
+                                </group>
+
+                            </group>
+                        </page>
+
+                        <page string="Style &amp; Design">
+                            <group col="2">
+
+                                <group string="Core Styles"
+                                       modifiers="{'readonly': [('measurements_locked','=',True)]}">
+                                    <field name="front_design"/>
+                                    <field name="sleeve_style"/>
+                                    <field name="collar_style"/>
+                                    <field name="cuff_style"/>
+                                    <field name="buttons_type"/>
+                                    <field name="stitching_type"/>
+                                </group>
+
+                                <group string="Pocket Configuration"
+                                       modifiers="{'readonly': [('measurements_locked','=',True)]}">
+                                    <field name="pocket_pen_big"/>
+                                    <field name="pocket_pen_small"/>
+                                    <field name="pocket_front"/>
+                                    <field name="pocket_key_left"/>
+                                    <field name="pocket_key_right"/>
+                                </group>
+
+                            </group>
+
+                            <group string="Template Guidance">
+                                <div class="o_form_label"
+                                     modifiers="{'invisible': [('garment_template','!=','arabic_kandura')]}">
+                                    Arabic Kandura: use the Arabic diagram and approved style combinations.
+                                </div>
+                                <div class="o_form_label"
+                                     modifiers="{'invisible': [('garment_template','!=','kuwaiti_kandura')]}">
+                                    Kuwaiti Kandura: use the Kuwaiti diagram and approved style combinations.
+                                </div>
+                            </group>
+                        </page>
+
+                        <page string="Accessories / Extras">
+                            <group col="1" modifiers="{'readonly': [('measurements_locked','=',True)]}">
+
+                                <group string="Accessories Notes">
+                                    <field name="accessories_notes" placeholder="Extra requirements / design notes..."/>
+                                </group>
+
+                                <group string="Accessories Lines">
+                                    <field name="accessory_line_ids" nolabel="1" colspan="2">
+                                        <list editable="bottom" string="Accessories / Extras">
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="accessory_type"/>
+                                            <field name="product_id"/>
+                                            <field name="quantity"/>
+                                            <field name="uom_id" readonly="1"/>
+                                            <field name="color"/>
+                                            <field name="size"/>
+                                            <field name="customer_provided"/>
+                                            <field name="is_required"/>
+                                            <field name="notes"/>
+                                        </list>
+                                    </field>
+                                </group>
+
+                            </group>
+                        </page>
+
+                        <page string="Quality Inspection">
+                            <group col="2">
+                                <group string="QC Checklist"
+                                       groups="tailor_management.group_tailor_qc,tailor_management.group_tailor_admin">
+                                    <field name="qc_check_measurements"/>
+                                    <field name="qc_check_fabric"/>
+                                    <field name="qc_check_stitching"/>
+                                    <field name="qc_check_style"/>
+                                    <field name="qc_check_finishing"/>
+                                    <field name="qc_manager_comment" placeholder="Manager comment / findings..."/>
+                                </group>
+
+                                <group string="QC Result">
+                                    <field name="qc_approved" readonly="1"/>
+                                    <field name="qc_approved_by" readonly="1"/>
+                                    <field name="qc_approved_on" readonly="1"/>
+                                </group>
+                            </group>
+
+                            <separator string="Important"/>
+                            <div class="text-muted">
+                                Production completion is blocked until QC is approved by a manager.
+                            </div>
+                        </page>
+
+                        <page string="Fabric">
+                            <group col="2">
+                                <group string="Fabric &amp; Quantity"
+                                       modifiers="{'readonly': [('status','!=','draft')]}"
+                                       groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin">
+                                    <field name="fabric_type" domain="[('type','in',('product','consu'))]"/>
+                                    <field name="fabric_qty"/>
+                                    <field name="fabric_unit_cost"/>
+                                    <field name="fabric_total_cost" readonly="1"/>
+                                    <field name="fabric_preference"/>
+                                </group>
+
+                                <group string="Inventory / Tracking">
+                                    <field name="fabric_deducted" readonly="1"/>
+                                    <div class="o_form_label">
+                                        Fabric stock is deducted automatically when order is confirmed.
+                                    </div>
+                                </group>
+                            </group>
+                        </page>
+
+                        <page string="Delivery &amp; Payment">
+                            <group col="2">
+                                <group string="Booking &amp; Delivery">
+                                    <field name="booking_date"
+                                           modifiers="{'readonly': [('status','!=','draft')]}"
+                                           groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                                    <field name="trial_date"
+                                           modifiers="{'readonly': [('status','!=','draft')]}"
+                                           groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                                    <field name="delivery_date"
+                                           modifiers="{'readonly': [('status','!=','draft')]}"
+                                           groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                                    <field name="home_delivery"
+                                           modifiers="{'readonly': [('status','!=','draft')]}"
+                                           groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                                </group>
+
+                                <group string="Payments">
+                                    <field name="currency_id" invisible="1"/>
+                                    <field name="advance_payment"
+                                           modifiers="{'readonly': [('status','!=','draft')]}"
+                                           groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                                    <field name="vat_amount" readonly="1"/>
+                                    <field name="balance" readonly="1"/>
+                                </group>
+                            </group>
+
+                            <group string="Signature">
+                                <group col="2">
+                                    <field name="customer_signature" widget="image"
+                                           options="{'preview_image':'customer_signature'}"
+                                           modifiers="{'readonly': [('status','!=','draft')]}"
+                                           groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                                    <field name="salesperson_name"
+                                           modifiers="{'readonly': [('status','!=','draft')]}"
+                                           groups="tailor_management.group_tailor_sales,tailor_management.group_tailor_admin"/>
+                                </group>
+                            </group>
+                        </page>
+
+                        <!-- ✅ Documents (no duplicates) -->
+                        <page string="Documents">
+                            <notebook>
+
+                                <page string="All Documents"
+                                      groups="tailor_management.group_tailor_admin">
+                                    <field name="document_ids">
+                                        <list string="Customer Documents">
+                                            <field name="name"/>
+                                            <field name="document_type"/>
+                                            <field name="partner_id"/>
+                                            <field name="upload_date"/>
+                                            <field name="uploaded_by"/>
+                                            <field name="attachment_ids" widget="many2many_tags" string="Files"/>
+                                            <button name="action_download_file" type="object"
+                                                    string="Download" class="btn-secondary"/>
+                                        </list>
+                                    </field>
+                                </page>
+
+                                <page string="Measurement Documents"
+                                      groups="tailor_management.group_tailor_tailor,tailor_management.group_tailor_qc">
+                                    <field name="document_ids" domain="[('document_type','=','measurement')]">
+                                        <list string="Measurement Documents">
+                                            <field name="name"/>
+                                            <field name="document_type"/>
+                                            <field name="partner_id"/>
+                                            <field name="upload_date"/>
+                                            <field name="uploaded_by"/>
+                                            <field name="attachment_ids" widget="many2many_tags" string="Files"/>
+                                            <button name="action_download_file" type="object"
+                                                    string="Download" class="btn-secondary"/>
+                                        </list>
+                                    </field>
+                                </page>
+
+                                <page string="Invoice Documents"
+                                      groups="tailor_management.group_tailor_sales">
+                                    <field name="document_ids" domain="[('document_type','=','invoice')]">
+                                        <list string="Invoice Documents">
+                                            <field name="name"/>
+                                            <field name="document_type"/>
+                                            <field name="partner_id"/>
+                                            <field name="upload_date"/>
+                                            <field name="uploaded_by"/>
+                                            <field name="attachment_ids" widget="many2many_tags" string="Files"/>
+                                            <button name="action_download_file" type="object"
+                                                    string="Download" class="btn-secondary"/>
+                                        </list>
+                                    </field>
+                                </page>
+
+                            </notebook>
+                        </page>
+
+                        <page string="Manufacturing">
+                            <group string="Manufacturing Orders">
+                                <field name="mrp_ids" nolabel="1">
+                                    <list string="MOs">
+                                        <field name="name"/>
+                                        <field name="product_id"/>
+                                        <field name="product_qty"/>
+                                        <field name="state"/>
+                                        <field name="origin"/>
+                                    </list>
+                                </field>
+                            </group>
+                            <group string="Related Sale Order">
+                                <field name="sale_order_id" readonly="1"/>
+                            </group>
+                        </page>
+
+                    </notebook>
+                </sheet>
+
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <!-- ========================================================= -->
+    <!-- ACTION + MENU                                               -->
+    <!-- ========================================================= -->
+    <record id="action_tailor_order" model="ir.actions.act_window">
+        <field name="name">Tailor Orders</field>
+        <field name="res_model">tailor.order</field>
+        <field name="view_mode">list,kanban,form</field>
+    </record>
+
+    <menuitem id="menu_tailor_root"
+              name="Tailor Management"
+              sequence="10"
+              groups="tailor_management.group_tailor_admin,tailor_management.group_tailor_sales,tailor_management.group_tailor_tailor,tailor_management.group_tailor_qc"/>
+
+    <menuitem id="menu_tailor_orders"
+              name="Orders"
+              parent="menu_tailor_root"
+              action="action_tailor_order"
+              sequence="10"
+              groups="tailor_management.group_tailor_admin,tailor_management.group_tailor_sales,tailor_management.group_tailor_tailor,tailor_management.group_tailor_qc"/>
+
+</odoo>

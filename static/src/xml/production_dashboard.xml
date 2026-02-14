@@ -1,0 +1,679 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="tailor_management.TailorProductionDashboard">
+
+    <div class="o_tm_prod_dashboard p-3 o_tm_dash_root">
+
+      <!-- ================= HEADER / RIBBON ================= -->
+      <div class="o_tm_ribbon">
+
+        <div class="o_tm_ribbon_left">
+          <h2 class="m-0">
+            <i class="fa fa-industry me-2"></i>Production Dashboard
+          </h2>
+        </div>
+
+        <div class="o_tm_ribbon_center">
+          <button class="o_tm_ribbon_btn"
+                  data-target="executive"
+                  t-on-click="onGoDashboard">
+            <i class="fa fa-line-chart me-2"></i>Executive
+          </button>
+          <button class="o_tm_ribbon_btn"
+                  data-target="showroom"
+                  t-on-click="onGoDashboard">
+            <i class="fa fa-building me-2"></i>Showroom
+          </button>
+          <button class="o_tm_ribbon_btn active"
+                  data-target="production"
+                  t-on-click="onGoDashboard">
+            <i class="fa fa-industry me-2"></i>Production
+          </button>
+        </div>
+
+        <div class="o_tm_ribbon_right">
+          <div class="d-flex gap-2 align-items-end flex-wrap">
+
+            <!-- ✅ Range picker (Today / 7d / 30d / Custom) -->
+            <div class="tm_range_bar">
+              <button class="tm_range_btn"
+                      t-att-class="state.filters.range === 'today' ? 'tm_range_btn active' : 'tm_range_btn'"
+                      data-range="today"
+                      t-on-click="onRangeClick">
+                Today
+              </button>
+              <button class="tm_range_btn"
+                      t-att-class="state.filters.range === '7d' ? 'tm_range_btn active' : 'tm_range_btn'"
+                      data-range="7d"
+                      t-on-click="onRangeClick">
+                7 Days
+              </button>
+              <button class="tm_range_btn"
+                      t-att-class="state.filters.range === '30d' ? 'tm_range_btn active' : 'tm_range_btn'"
+                      data-range="30d"
+                      t-on-click="onRangeClick">
+                30 Days
+              </button>
+              <button class="tm_range_btn"
+                      t-att-class="state.filters.range === 'custom' ? 'tm_range_btn active' : 'tm_range_btn'"
+                      data-range="custom"
+                      t-on-click="onRangeClick">
+                Custom
+              </button>
+            </div>
+
+            <div>
+              <label class="form-label mb-0">From</label>
+              <input type="date" class="form-control"
+                     t-model="state.filters.date_from"
+                     t-att-disabled="state.filters.range !== 'custom'"/>
+            </div>
+
+            <div>
+              <label class="form-label mb-0">To</label>
+              <input type="date" class="form-control"
+                     t-model="state.filters.date_to"
+                     t-att-disabled="state.filters.range !== 'custom'"/>
+            </div>
+
+            <div>
+              <button class="btn btn-primary"
+                      t-on-click="applyFilters"
+                      t-att-disabled="state.filters.range !== 'custom'">
+                <i class="fa fa-filter me-1"></i>Apply
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ✅ SCROLL AREA START -->
+      <div class="o_tm_dash_scroll">
+
+        <!-- ================= LOADING ================= -->
+        <t t-if="state.loading">
+          <div class="alert alert-info">
+            <i class="fa fa-spinner fa-spin me-2"></i>Loading Production KPIs…
+          </div>
+        </t>
+
+        <!-- ================= CONTENT ================= -->
+        <t t-else="">
+
+          <!-- ✅ safe defaults (NO &&) -->
+          <t t-set="k" t-value="state.data ? (state.data.kpis || {}) : {}"/>
+          <t t-set="charts" t-value="state.data ? (state.data.charts || {}) : {}"/>
+          <t t-set="tables" t-value="state.data ? (state.data.tables || {}) : {}"/>
+
+          <t t-set="wip_by_month" t-value="charts.wip_by_month || []"/>
+          <t t-set="throughput_by_month" t-value="charts.throughput_by_month || []"/>
+          <t t-set="top_tailors_wip" t-value="charts.top_tailors_wip || []"/>
+          <t t-set="top_tailors_delivered" t-value="charts.top_tailors_delivered || []"/>
+          <t t-set="tailor_productivity" t-value="charts.tailor_productivity || []"/>
+
+          <t t-set="late_orders" t-value="tables.late_orders || []"/>
+          <t t-set="delayed_orders" t-value="tables.delayed_orders || []"/>
+          <t t-set="kanban" t-value="tables.kanban || []"/>
+          <t t-set="stock_alerts" t-value="tables.stock_alerts || []"/>
+
+          <!-- ✅ REAL DATE LABEL (for all KPI tags) -->
+          <t t-set="date_from" t-value="state.filters.date_from ? state.filters.date_from : '-'"/>
+          <t t-set="date_to" t-value="state.filters.date_to ? state.filters.date_to : '-'"/>
+          <t t-set="date_label" t-value="date_from + ' → ' + date_to"/>
+
+          <!-- ================= KPI ROW ================= -->
+          <div class="row g-3 mb-3">
+
+            <div class="col-12 col-md-3">
+              <div class="o_tm_kpi_tile o_tm_kpi_green"
+                   role="button" tabindex="0"
+                   t-on-click="openWipManufacturing">
+                <div class="o_tm_kpi_top">
+                  <div class="o_tm_kpi_title">
+                    <i class="fa fa-tasks me-2"></i>WIP Orders
+                  </div>
+                  <div class="o_tm_kpi_tag"><t t-esc="date_label"/></div>
+                </div>
+                <div class="o_tm_kpi_value"><t t-esc="k.wip_orders || 0"/></div>
+                <div class="o_tm_kpi_sub">
+                  <i class="fa fa-random me-2"></i>In production pipeline
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <div class="o_tm_kpi_tile o_tm_kpi_orange"
+                   role="button" tabindex="0"
+                   data-stage="cutting"
+                   t-on-click="onOpenStage">
+                <div class="o_tm_kpi_top">
+                  <div class="o_tm_kpi_title">
+                    <i class="fa fa-scissors me-2"></i>Cutting
+                  </div>
+                  <div class="o_tm_kpi_tag"><t t-esc="date_label"/></div>
+                </div>
+                <div class="o_tm_kpi_value"><t t-esc="k.cutting_orders || 0"/></div>
+                <div class="o_tm_kpi_sub">
+                  <i class="fa fa-cut me-2"></i>Cutting stage
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-md-3">
+              <div class="o_tm_kpi_tile o_tm_kpi_red"
+                   role="button" tabindex="0"
+                   data-stage="sewing"
+                   t-on-click="onOpenStage">
+                <div class="o_tm_kpi_top">
+                  <div class="o_tm_kpi_title">
+                    <i class="fa fa-cogs me-2"></i>Sewing
+                  </div>
+                  <div class="o_tm_kpi_tag"><t t-esc="date_label"/></div>
+                </div>
+                <div class="o_tm_kpi_value"><t t-esc="k.sewing_orders || 0"/></div>
+                <div class="o_tm_kpi_sub">
+                  <i class="fa fa-spinner me-2"></i>Sewing in progress
+                </div>
+              </div>
+            </div>
+
+            <!-- ✅ QC MUST NOT be clickable -->
+            <div class="col-12 col-md-3">
+              <div class="o_tm_kpi_tile o_tm_kpi_blue">
+                <div class="o_tm_kpi_top">
+                  <div class="o_tm_kpi_title">
+                    <i class="fa fa-shield me-2"></i>QC
+                  </div>
+                  <div class="o_tm_kpi_tag"><t t-esc="date_label"/></div>
+                </div>
+                <div class="o_tm_kpi_value"><t t-esc="k.qc_orders || 0"/></div>
+                <div class="o_tm_kpi_sub">
+                  <i class="fa fa-check-circle me-2"></i>QC Pass: <t t-esc="k.qc_pass_pct || 0"/>%
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ================= SECOND ROW ================= -->
+          <div class="row g-3 mb-3">
+
+            <div class="col-12 col-lg-4">
+              <div class="o_tm_info_tile o_tm_info_yellow">
+                <div class="o_tm_info_title">
+                  <i class="fa fa-exchange me-2"></i>Bottleneck Stage
+                </div>
+                <div class="o_tm_info_value"><t t-esc="k.bottleneck_stage || '—'"/></div>
+                <div class="o_tm_info_sub">
+                  Ready: <t t-esc="k.ready_delivery || 0"/> | Delivered: <t t-esc="k.delivered || 0"/>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-4">
+              <div class="o_tm_info_tile o_tm_info_gray">
+                <div class="o_tm_info_title">
+                  <i class="fa fa-tachometer me-2"></i>Efficiency
+                </div>
+                <div class="o_tm_info_sub">Avg Cycle: <b><t t-esc="k.avg_cycle_days || 0"/></b> days</div>
+                <div class="o_tm_info_sub">Avg QC Time: <b><t t-esc="k.avg_qc_days || 0"/></b> days</div>
+              </div>
+            </div>
+
+            <!-- ✅ LATE ORDERS clickable -->
+            <div class="col-12 col-lg-4">
+              <div class="o_tm_info_tile o_tm_info_red"
+                   role="button" tabindex="0"
+                   t-on-click="openLateOrders">
+                <div class="o_tm_info_title">
+                  <i class="fa fa-exclamation-triangle me-2"></i>Late Orders
+                </div>
+                <div class="o_tm_info_value"><t t-esc="k.late_orders || 0"/></div>
+                <div class="o_tm_info_sub">
+                  Fabric: <t t-esc="k.late_fabric_m || 0"/> m | Accessories: <t t-esc="k.late_accessories_qty || 0"/>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ================= NEW ROW (Delayed + Stock Alerts) ================= -->
+          <div class="row g-3 mb-3">
+
+            <!-- ✅ DELAYED ORDERS clickable (FIXED) -->
+            <div class="col-12 col-lg-6">
+              <div class="o_tm_info_tile o_tm_info_red"
+                   role="button" tabindex="0"
+                   t-on-click="openDelayedOrders">
+                <div class="o_tm_info_title">
+                  <i class="fa fa-clock-o me-2"></i>Delayed Orders (Deadline)
+                </div>
+                <div class="o_tm_info_value"><t t-esc="k.delayed_orders || 0"/></div>
+                <div class="o_tm_info_sub">Orders where deadline is passed</div>
+              </div>
+            </div>
+
+            <div class="col-12 col-lg-6">
+              <div class="o_tm_info_tile o_tm_info_yellow" role="button" tabindex="0" t-on-click="openStockAlerts">
+                <div class="o_tm_info_title">
+                  <i class="fa fa-warning me-2"></i>Stock Alerts (Fabrics)
+                </div>
+                <div class="o_tm_info_value"><t t-esc="k.stock_alerts || 0"/></div>
+                <div class="o_tm_info_sub">Fabrics below minimum quantity</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ================= KANBAN BOARD ================= -->
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <div class="fw-bold mb-2">
+                <i class="fa fa-columns me-2"></i>Active Orders (Kanban)
+              </div>
+
+              <t t-if="kanban.length">
+                <div class="d-flex gap-3 overflow-auto">
+                  <t t-foreach="kanban" t-as="col" t-key="col.key">
+                    <div class="border rounded p-2" style="min-width: 280px;">
+                      <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="fw-bold">
+                          <t t-esc="col.title"/> (<t t-esc="col.count || 0"/>)
+                        </div>
+                        <button class="btn btn-sm btn-outline-primary"
+                                t-on-click.stop="onOpenStage"
+                                t-att-data-stage="col.key">
+                          <i class="fa fa-folder-open-o me-1"></i>Open
+                        </button>
+                      </div>
+
+                      <t t-if="(col.cards || []).length">
+                        <t t-foreach="(col.cards || [])" t-as="c" t-key="c.id">
+                          <div t-att-class="'p-2 mb-2 rounded border ' + (c.is_delayed ? 'border-danger' : '')">
+                            <div class="fw-semibold"><t t-esc="c.name"/></div>
+                            <div class="small text-muted"><t t-esc="c.customer"/></div>
+                            <div class="small">Tailor: <t t-esc="c.tailor || '—'"/></div>
+                            <div class="small">Delivery: <t t-esc="c.delivery_date || ''"/></div>
+                            <t t-if="c.is_delayed">
+                              <div class="small text-danger fw-bold">
+                                <i class="fa fa-exclamation-circle me-1"></i>
+                                Delayed (deadline: <t t-esc="c.date_deadline || ''"/>)
+                              </div>
+                            </t>
+                          </div>
+                        </t>
+                      </t>
+                      <t t-else="">
+                        <div class="text-muted small">No orders.</div>
+                      </t>
+
+                    </div>
+                  </t>
+                </div>
+              </t>
+
+              <t t-else="">
+                <div class="text-muted small">No kanban data.</div>
+              </t>
+
+            </div>
+          </div>
+
+          <!-- ===================================================== -->
+          <!-- ✅ PRODUCTION CHARTS — EXECUTIVE PANEL STYLE (tm_panel) -->
+          <!-- ===================================================== -->
+
+          <!-- ===== WIP BY MONTH ===== -->
+          <div class="tm_panel mb-3">
+            <div class="tm_panel_head">
+              <div class="tm_panel_title">
+                <i class="fa fa-line-chart"></i>WIP by Month
+              </div>
+              <div class="tm_panel_tools">
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.wip_by_month === 'table' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="wip_by_month" data-view="table"
+                          t-on-click="onSetChartView">Table</button>
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.wip_by_month === 'line' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="wip_by_month" data-view="line"
+                          t-on-click="onSetChartView">Line</button>
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.wip_by_month === 'area' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="wip_by_month" data-view="area"
+                          t-on-click="onSetChartView">Area</button>
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.wip_by_month === 'bar' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="wip_by_month" data-view="bar"
+                          t-on-click="onSetChartView">Bar</button>
+                </div>
+              </div>
+            </div>
+
+            <t t-if="state.ui.chart_view.wip_by_month === 'table'">
+              <t t-if="wip_by_month.length">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr><th>Month</th><th class="text-end">WIP Orders</th></tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="wip_by_month" t-as="r" t-key="r.label">
+                        <tr><td><t t-esc="r.label"/></td><td class="text-end"><t t-esc="r.value"/></td></tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </div>
+              </t>
+              <t t-else=""><div class="tm_empty">No WIP trend data.</div></t>
+            </t>
+            <t t-else="">
+              <div class="tm_chart_box">
+                <canvas t-ref="wipByMonthCanvas"></canvas>
+              </div>
+            </t>
+          </div>
+
+          <!-- ===== THROUGHPUT BY MONTH ===== -->
+          <div class="tm_panel mb-3">
+            <div class="tm_panel_head">
+              <div class="tm_panel_title">
+                <i class="fa fa-bar-chart"></i>Throughput by Month
+              </div>
+              <div class="tm_panel_tools">
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.throughput_by_month === 'table' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="throughput_by_month" data-view="table"
+                          t-on-click="onSetChartView">Table</button>
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.throughput_by_month === 'line' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="throughput_by_month" data-view="line"
+                          t-on-click="onSetChartView">Line</button>
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.throughput_by_month === 'bar' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="throughput_by_month" data-view="bar"
+                          t-on-click="onSetChartView">Bar</button>
+                </div>
+              </div>
+            </div>
+
+            <t t-if="state.ui.chart_view.throughput_by_month === 'table'">
+              <t t-if="throughput_by_month.length">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr><th>Month</th><th class="text-end">Delivered Orders</th></tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="throughput_by_month" t-as="r" t-key="r.label">
+                        <tr><td><t t-esc="r.label"/></td><td class="text-end"><t t-esc="r.value"/></td></tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </div>
+              </t>
+              <t t-else=""><div class="tm_empty">No throughput data.</div></t>
+            </t>
+            <t t-else="">
+              <div class="tm_chart_box">
+                <canvas t-ref="throughputByMonthCanvas"></canvas>
+              </div>
+            </t>
+          </div>
+
+          <!-- ===== TOP TAILORS (WIP) ===== -->
+          <div class="tm_panel mb-3">
+            <div class="tm_panel_head">
+              <div class="tm_panel_title">
+                <i class="fa fa-users"></i>Top Tailors (WIP)
+              </div>
+              <div class="tm_panel_tools">
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.top_tailors_wip === 'table' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="top_tailors_wip" data-view="table"
+                          t-on-click="onSetChartView">Table</button>
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.top_tailors_wip === 'bar' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="top_tailors_wip" data-view="bar"
+                          t-on-click="onSetChartView">Bar</button>
+                </div>
+              </div>
+            </div>
+
+            <t t-if="state.ui.chart_view.top_tailors_wip === 'table'">
+              <t t-if="top_tailors_wip.length">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr><th>Tailor</th><th class="text-end">WIP</th></tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="top_tailors_wip" t-as="r" t-key="r.label">
+                        <tr><td><t t-esc="r.label"/></td><td class="text-end"><t t-esc="r.value"/></td></tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </div>
+              </t>
+              <t t-else=""><div class="tm_empty">No tailors WIP ranking.</div></t>
+            </t>
+            <t t-else="">
+              <div class="tm_chart_box">
+                <canvas t-ref="topTailorsWipCanvas"></canvas>
+              </div>
+            </t>
+          </div>
+
+          <!-- ===== TOP TAILORS (DELIVERED) ===== -->
+          <div class="tm_panel mb-3">
+            <div class="tm_panel_head">
+              <div class="tm_panel_title">
+                <i class="fa fa-check"></i>Top Tailors (Delivered)
+              </div>
+              <div class="tm_panel_tools">
+                <div class="btn-group btn-group-sm">
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.top_tailors_delivered === 'table' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="top_tailors_delivered" data-view="table"
+                          t-on-click="onSetChartView">Table</button>
+                  <button class="btn btn-outline-secondary"
+                          t-att-class="state.ui.chart_view.top_tailors_delivered === 'bar' ? 'btn btn-outline-secondary active' : 'btn btn-outline-secondary'"
+                          data-key="top_tailors_delivered" data-view="bar"
+                          t-on-click="onSetChartView">Bar</button>
+                </div>
+              </div>
+            </div>
+
+            <t t-if="state.ui.chart_view.top_tailors_delivered === 'table'">
+              <t t-if="top_tailors_delivered.length">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr><th>Tailor</th><th class="text-end">Delivered</th></tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="top_tailors_delivered" t-as="r" t-key="r.label">
+                        <tr><td><t t-esc="r.label"/></td><td class="text-end"><t t-esc="r.value"/></td></tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </div>
+              </t>
+              <t t-else=""><div class="tm_empty">No delivered ranking.</div></t>
+            </t>
+            <t t-else="">
+              <div class="tm_chart_box">
+                <canvas t-ref="topTailorsDeliveredCanvas"></canvas>
+              </div>
+            </t>
+          </div>
+
+          <!-- ================= DELAYED ORDERS TABLE ================= -->
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <div class="fw-bold mb-2">
+                <i class="fa fa-clock-o me-2"></i>Delayed Orders (Top 10 by Deadline)
+              </div>
+
+              <t t-if="delayed_orders.length">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Status</th>
+                        <th class="text-end">Deadline</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="delayed_orders" t-as="o" t-key="o.id">
+                        <tr class="table-danger">
+                          <td><t t-esc="o.name"/></td>
+                          <td><t t-esc="o.customer"/></td>
+                          <td><t t-esc="o.status"/></td>
+                          <td class="text-end"><t t-esc="o.date_deadline"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </div>
+              </t>
+
+              <t t-else="">
+                <div class="text-muted small">No delayed orders.</div>
+              </t>
+
+            </div>
+          </div>
+
+          <!-- ================= STOCK ALERTS TABLE ================= -->
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <div class="fw-bold mb-2">
+                <i class="fa fa-warning me-2"></i>Stock Alerts (Fabrics below minimum)
+              </div>
+
+              <t t-if="stock_alerts.length">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr>
+                        <th>Fabric</th>
+                        <th>Location</th>
+                        <th class="text-end">On Hand</th>
+                        <th class="text-end">Minimum</th>
+                        <th class="text-end">To Order</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="stock_alerts" t-as="s" t-key="s.product + (s.location || '')">
+                        <tr>
+                          <td><t t-esc="s.product"/></td>
+                          <td><t t-esc="s.location"/></td>
+                          <td class="text-end"><t t-esc="s.on_hand"/></td>
+                          <td class="text-end"><t t-esc="s.min_qty"/></td>
+                          <td class="text-end"><t t-esc="s.to_order"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </div>
+              </t>
+
+              <t t-else="">
+                <div class="text-muted small">No fabric stock alerts.</div>
+              </t>
+
+            </div>
+          </div>
+
+          <!-- ================= TAILOR PRODUCTIVITY (SIMPLE LIST) ================= -->
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <div class="fw-bold mb-2">
+                <i class="fa fa-user me-2"></i>Tailor Productivity (Completed MOs)
+              </div>
+
+              <t t-if="tailor_productivity.length">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr>
+                        <th>Tailor</th>
+                        <th class="text-end">Completed MOs</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="tailor_productivity" t-as="trow" t-key="trow.label">
+                        <tr>
+                          <td><t t-esc="trow.label"/></td>
+                          <td class="text-end"><t t-esc="trow.value"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </div>
+              </t>
+
+              <t t-else="">
+                <div class="text-muted small">No productivity data.</div>
+              </t>
+
+            </div>
+          </div>
+
+          <!-- ================= LATE ORDERS TABLE ================= -->
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="fw-bold mb-2">
+                <i class="fa fa-exclamation-triangle me-2"></i>Late Orders (Top 10)
+              </div>
+
+              <t t-if="late_orders.length">
+                <div class="table-responsive">
+                  <table class="table table-sm mb-0">
+                    <thead>
+                      <tr>
+                        <th>Order</th>
+                        <th>Customer</th>
+                        <th>Status</th>
+                        <th class="text-end">Delivery</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <t t-foreach="late_orders" t-as="o" t-key="o.id">
+                        <tr>
+                          <td><t t-esc="o.name"/></td>
+                          <td><t t-esc="o.customer"/></td>
+                          <td><t t-esc="o.status"/></td>
+                          <td class="text-end"><t t-esc="o.delivery_date"/></td>
+                        </tr>
+                      </t>
+                    </tbody>
+                  </table>
+                </div>
+              </t>
+
+              <t t-else="">
+                <div class="text-muted small">No late orders.</div>
+              </t>
+
+            </div>
+          </div>
+
+        </t>
+
+      </div>
+      <!-- ✅ SCROLL AREA END -->
+
+    </div>
+  </t>
+
+</templates>

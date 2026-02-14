@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="action_tailor_production_dashboard" model="ir.actions.client">
+        <field name="name">Production Dashboard</field>
+        <field name="tag">tailor_production_dashboard</field>
+    </record>
+
+    <menuitem id="menu_tailor_production_dashboard"
+              name="Production Dashboard"
+              parent="menu_tailor_reporting_root"
+              action="action_tailor_production_dashboard"
+              sequence="20"/>
+
+</odoo>

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <!-- ================= Tailor Order Status ================= -->
+        <record id="email_template_tailor_order_status" model="mail.template">
+            <field name="name">Tailor Order Status Update</field>
+            <field name="model_id" ref="tailor_management.model_tailor_order"/>
+            <field name="subject">Tailor Order Update: {{ object.name }}</field>
+            <field name="email_from">{{ (user.email_formatted or user.email) }}</field>
+            <field name="email_to">{{ object.partner_id.email }}</field>
+            <field name="lang">{{ object.partner_id.lang or 'en_US' }}</field>
+
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,sans-serif; margin: 0px; padding: 20px;">
+                    <p>Hello <t t-out="object.partner_id.name or 'Customer'"/>,</p>
+
+                    <p>
+                        Your tailor order
+                        <strong><t t-out="object.name"/></strong>
+                        status is now:
+                        <span style="color:#875A7B; font-weight:bold;">
+                            <t t-out="dict(object._fields['status'].selection).get(object.status)"/>
+                        </span>.
+                    </p>
+
+                    <div style="background-color:#f8f9fa; padding:15px; border-radius:5px;">
+                        <p><strong>Product:</strong> <t t-out="object.product_id.display_name"/></p>
+                        <p><strong>Quantity:</strong> <t t-out="object.quantity"/></p>
+                        <p><strong>Delivery Date:</strong> <t t-out="object.delivery_date"/></p>
+                    </div>
+
+                    <p style="margin-top:20px;">Thank you for your trust!</p>
+                </div>
+            </field>
+        </record>
+
+
+
+
+        <!-- ================= Sale Order Status ================= -->
+        <record id="email_template_sale_order_status" model="mail.template">
+            <field name="name">Sale Order Tailor Status Update</field>
+            <field name="model_id" ref="sale.model_sale_order"/>
+            <field name="subject">Sale Order Update: {{ object.name }}</field>
+            <field name="email_from">{{ (user.email_formatted or user.email) }}</field>
+            <field name="email_to">{{ object.partner_id.email }}</field>
+            <field name="lang">{{ object.partner_id.lang or 'en_US' }}</field>
+
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,sans-serif; padding:20px;">
+                    <p>Hello <t t-out="object.partner_id.name or 'Customer'"/>,</p>
+
+                    <p>
+                        Your Sale Order
+                        <strong><t t-out="object.name"/></strong>
+                        status is now:
+                        <strong><t t-out="object.state"/></strong>.
+                    </p>
+
+                    <p>
+                        Expected Delivery:
+                        <t t-out="object.commitment_date or object.expected_date"/>
+                    </p>
+
+                    <p>Thank you for your trust!</p>
+                </div>
+            </field>
+        </record>
+
+
+        <!-- ================= Manufacturing Order DONE ================= -->
+        <record id="email_template_mo_done" model="mail.template">
+            <field name="name">Manufacturing Order Completed</field>
+            <field name="model_id" ref="mrp.model_mrp_production"/>
+            <field name="subject">Manufacturing Order Completed: {{ object.name }}</field>
+            <field name="email_from">{{ (user.email_formatted or user.email) }}</field>
+            <field name="email_to">{{ object.partner_id.email }}</field>
+            <field name="lang">{{ object.partner_id.lang or 'en_US' }}</field>
+
+            <field name="body_html" type="html">
+                <div style="font-family:Arial,sans-serif; margin: 0px; padding: 20px;">
+                    <p>Hello <t t-out="object.partner_id.name or 'Customer'"/>,</p>
+
+                    <p>
+                        We are happy to inform you that your manufacturing order
+                        <strong><t t-out="object.name"/></strong>
+                        has been completed.
+                    </p>
+
+                    <div style="background-color:#f8f9fa; padding:15px; border-radius:5px;">
+                        <p><strong>Product:</strong>
+                            <t t-out="object.product_id.display_name"/>
+                        </p>
+                        <p><strong>Quantity:</strong>
+                            <t t-out="object.product_qty"/>
+                        </p>
+                        <p><strong>Delivery Date:</strong>
+                            <t t-out="object.delivery_date"/>
+                        </p>
+                    </div>
+
+                    <p style="margin-top:20px;">
+                        Thank you for choosing our tailoring services!
+                    </p>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

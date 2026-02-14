@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+
+    <!-- Client actions -->
+    <record id="action_tailor_executive_dashboard" model="ir.actions.client">
+      <field name="name">Executive Dashboard</field>
+      <field name="tag">tailor_executive_dashboard</field>
+    </record>
+
+    <record id="action_tailor_showroom_dashboard" model="ir.actions.client">
+      <field name="name">Showroom Dashboard</field>
+      <field name="tag">tailor_showroom_dashboard</field>
+    </record>
+
+    <record id="action_tailor_production_dashboard" model="ir.actions.client">
+      <field name="name">Production Dashboard</field>
+      <field name="tag">tailor_production_dashboard</field>
+    </record>
+
+    <!-- Reporting root -->
+    <menuitem id="menu_tailor_reporting_root"
+              name="Reporting"
+              parent="tailor_management.menu_tailor_root"
+              sequence="60"
+              groups="tailor_management.group_tailor_admin,tailor_management.group_tailor_sales"/>
+
+    <!-- Executive -->
+    <menuitem id="menu_tailor_exec_dashboard"
+              name="Executive Dashboard"
+              parent="menu_tailor_reporting_root"
+              action="action_tailor_executive_dashboard"
+              sequence="10"
+              groups="tailor_management.group_tailor_admin,tailor_management.group_tailor_sales"/>
+
+    <!-- Showroom -->
+    <menuitem id="menu_tailor_showroom_dashboard"
+              name="Showroom Dashboard"
+              parent="menu_tailor_reporting_root"
+              action="action_tailor_showroom_dashboard"
+              sequence="20"
+              groups="tailor_management.group_tailor_admin,tailor_management.group_tailor_sales"/>
+
+    <!-- Production (Admin + Sales + QC) -->
+    <menuitem id="menu_tailor_production_dashboard"
+              name="Production Dashboard"
+              parent="menu_tailor_reporting_root"
+              action="action_tailor_production_dashboard"
+              sequence="30"
+              groups="tailor_management.group_tailor_admin,tailor_management.group_tailor_sales,tailor_management.group_tailor_qc"/>
+
+  </data>
+</odoo>

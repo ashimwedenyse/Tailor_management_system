@@ -1,0 +1,38 @@
+/* =====================================================
+   Tailor Order ONLY — Odoo Enterprise Minimal
+   ===================================================== */
+.o_web_client { outline: 8px solid red !important; }
+
+/* Odoo 19 often has data-res-model */
+.o_form_view .o_form_renderer[data-res-model="tailor.order"] .o_form_sheet_bg,
+.o_form_view .o_form_renderer[data-model="tailor.order"] .o_form_sheet_bg {
+  background: #f8f9fa !important;
+  padding: 8px 10px 14px !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  max-height: calc(100vh - 210px) !important;
+}
+
+.o_form_view .o_form_renderer[data-res-model="tailor.order"] .o_form_sheet,
+.o_form_view .o_form_renderer[data-model="tailor.order"] .o_form_sheet {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 14px 16px !important;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.05);
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.03);
+}
+
+/* Image control (diagram) */
+.o_form_view .o_form_renderer[data-res-model="tailor.order"] img,
+.o_form_view .o_form_renderer[data-model="tailor.order"] img {
+  max-width: 100%;
+  max-height: 460px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 1px solid rgba(0,0,0,.06);
+  box-shadow: 0 2px 10px rgba(0,0,0,.04);
+  background: #fff;
+  padding: 6px;
+}

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+  <data>
+
+    <!-- Sales: can see all orders -->
+    <record id="rule_tailor_order_sales_all" model="ir.rule">
+      <field name="name">Tailor Orders: Sales all</field>
+      <field name="model_id" ref="model_tailor_order"/>
+      <field name="domain_force">[(1,'=',1)]</field>
+      <field name="groups" eval="[(4, ref('tailor_management.group_tailor_sales'))]"/>
+      <field name="perm_read" eval="1"/>
+      <field name="perm_write" eval="1"/>
+      <field name="perm_create" eval="1"/>
+      <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- Tailor: only orders assigned to them -->
+    <record id="rule_tailor_order_tailor_assigned" model="ir.rule">
+      <field name="name">Tailor Orders: Tailor assigned only</field>
+      <field name="model_id" ref="model_tailor_order"/>
+      <field name="domain_force">[('tailor_id','=',user.id)]</field>
+      <field name="groups" eval="[(4, ref('tailor_management.group_tailor_tailor'))]"/>
+      <field name="perm_read" eval="1"/>
+      <field name="perm_write" eval="1"/>
+      <field name="perm_create" eval="0"/>
+      <field name="perm_unlink" eval="0"/>
+    </record>
+
+    <!-- QC: see all orders (you can later filter by status if you want) -->
+    <record id="rule_tailor_order_qc_all" model="ir.rule">
+      <field name="name">Tailor Orders: QC all</field>
+      <field name="model_id" ref="model_tailor_order"/>
+      <field name="domain_force">[(1,'=',1)]</field>
+      <field name="groups" eval="[(4, ref('tailor_management.group_tailor_qc'))]"/>
+      <field name="perm_read" eval="1"/>
+      <field name="perm_write" eval="1"/>
+      <field name="perm_create" eval="0"/>
+      <field name="perm_unlink" eval="0"/>
+    </record>
+
+  </data>
+</odoo>

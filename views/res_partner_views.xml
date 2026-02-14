@@ -1,0 +1,47 @@
+<odoo>
+    <record id="view_partner_form_inherit_tailor" model="ir.ui.view">
+        <field name="name">res.partner.form.inherit.tailor</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="Tailor Measurements">
+                    <field name="measurements_ids">
+                        <list editable="bottom">
+                            <field name="measurement_date"/>
+                            <field name="length"/>
+                            <field name="shoulder"/>
+                            <field name="sleeve_length"/>
+                            <field name="chest"/>
+                            <field name="waist"/>
+                            <field name="hip"/>
+                            <field name="neck"/>
+                            <field name="bottom_width"/>
+                            <field name="fabric_preference"/>
+                            <field name="style_preference"/>
+                            <field name="fitting_style"/>
+                            <field name="measurement_notes"/>
+                        </list>
+                        <form>
+                            <group>
+                                <field name="measurement_date"/>
+                                <field name="length"/>
+                                <field name="shoulder"/>
+                                <field name="sleeve_length"/>
+                                <field name="chest"/>
+                                <field name="waist"/>
+                                <field name="hip"/>
+                                <field name="neck"/>
+                                <field name="bottom_width"/>
+                                <field name="fabric_preference"/>
+                                <field name="style_preference"/>
+                                <field name="fitting_style"/>
+                                <field name="measurement_notes"/>
+                            </group>
+                        </form>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+  <!-- Server action bound to Contacts (res.partner) so it appears in Action menu -->
+  <record id="server_action_ai_measure_partner" model="ir.actions.server">
+    <field name="name">AI Measure</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="binding_model_id" ref="base.model_res_partner"/>
+    <field name="binding_view_types">form</field>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+action = {
+    "type": "ir.actions.act_window",
+    "name": "AI Measure",
+    "res_model": "tailor.ai.measure.wizard",
+    "view_mode": "form",
+    "target": "new",
+    "context": {
+        "default_target_model": "res.partner",
+        "default_partner_id": record.id,
+    },
+}
+    ]]></field>
+  </record>
+
+</odoo>
+

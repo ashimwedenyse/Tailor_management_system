@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <template id="tailor_assets_backend"
+            name="Tailor Backend Assets"
+            inherit_id="web.assets_web">
+    <xpath expr="." position="inside">
+      <link rel="stylesheet" type="text/scss" href="/tailor_management/static/src/scss/tailor_form.scss"/>
+    </xpath>
+  </template>
+</odoo>

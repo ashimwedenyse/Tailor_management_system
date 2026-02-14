@@ -1,0 +1,38 @@
+<odoo>
+    <record id="view_customer_documents_list" model="ir.ui.view">
+        <field name="name">customer.documents.list</field>
+        <field name="model">customer.documents</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="document_type"/>
+                <field name="partner_id"/>
+                <field name="tailor_order_id"/>
+                <field name="uploaded_by"/>
+                <field name="upload_date"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_customer_documents_form" model="ir.ui.view">
+        <field name="name">customer.documents.form</field>
+        <field name="model">customer.documents</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="file"/>
+                        <field name="filename"/>
+                        <field name="document_type"/>
+                        <field name="partner_id"/>
+                        <field name="tailor_order_id"/>
+                        <field name="description"/>
+                        <field name="uploaded_by"/>
+                        <field name="upload_date"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

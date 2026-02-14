@@ -1,0 +1,353 @@
+/* =====================================================
+   PRODUCTION DASHBOARD — SCROLL FIX
+   ===================================================== */
+
+.o_tm_dash_root {
+  height: calc(100vh - 120px);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.o_tm_dash_scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 90px;
+}
+
+/* =====================================================
+   PRODUCTION DASHBOARD STYLES
+   + Executive-like chart presentation (tm_panel style)
+   ===================================================== */
+
+/* ✅ Keyframes MUST be TOP-LEVEL (plain CSS safe) */
+@keyframes tmSlideUp { from { opacity: 0; transform: translateY(22px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes tmIconPop { 0% { transform: scale(.7); opacity: 0; } 70% { transform: scale(1.10); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes tmPulseGlowRed { 0% { box-shadow: 0 0 0 0 rgba(198,40,40,.45);} 70% { box-shadow: 0 0 0 14px rgba(198,40,40,0);} 100% { box-shadow: 0 0 0 0 rgba(198,40,40,0);} }
+@keyframes tmPulseGlowYellow { 0% { box-shadow: 0 0 0 0 rgba(185,122,0,.35);} 70% { box-shadow: 0 0 0 14px rgba(185,122,0,0);} 100% { box-shadow: 0 0 0 0 rgba(185,122,0,0);} }
+@keyframes tmFloatProd { 0% { transform: translateY(0);} 50% { transform: translateY(-4px);} 100% { transform: translateY(0);} }
+@keyframes tmGlowProd { 0% { box-shadow: 0 2px 8px rgba(0,0,0,.08), 0 0 0 rgba(111,66,193,0);} 50% { box-shadow: 0 18px 36px rgba(0,0,0,.14), 0 0 26px rgba(111,66,193,.22);} 100% { box-shadow: 0 2px 8px rgba(0,0,0,.08), 0 0 0 rgba(111,66,193,0);} }
+@keyframes tmShimmerProd { 0% { transform: translateX(-160%) skewX(-10deg); opacity: 0; } 10% { opacity: .48; } 55% { opacity: .48; } 100% { transform: translateX(160%) skewX(-10deg); opacity: 0; } }
+@keyframes tmIconBounceProd { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-2px);} }
+
+.o_tm_prod_dashboard {
+
+  .o_tm_card_h { min-height: 170px; }
+
+  /* =====================================================
+     ✅ Sticky ribbon
+     ===================================================== */
+  .o_tm_ribbon {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    border-radius: 14px;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    padding: 10px 12px;
+    margin-bottom: 12px;
+  }
+
+  /* =====================================================
+     ✅ Range pills (Executive clean style)
+     ===================================================== */
+  .tm_range_bar {
+    background: rgba(0,0,0,0.04);
+    padding: 4px;
+    border-radius: 999px;
+    display: inline-flex;
+    gap: 4px;
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+
+  .tm_range_btn {
+    border: 0;
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-weight: 800;
+    font-size: 13px;
+    transition: background .15s ease, transform .15s ease;
+  }
+
+  .tm_range_btn:hover { transform: translateY(-1px); }
+  .tm_range_btn.active { background: #0d6efd; color: #fff; }
+
+  /* =====================================================
+     ✅ EXECUTIVE-LIKE ICON LOOK (badge + purple hover)
+     ===================================================== */
+  .fw-bold i,
+  .o_tm_kpi_title i,
+  .o_tm_info_title i,
+  .btn i {
+    font-size: 14px;
+    margin-right: 6px;
+    opacity: .95;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    padding: 3px 6px;
+    transition: background .18s ease, color .18s ease, transform .18s ease, filter .18s ease;
+  }
+
+  .fw-bold i { color: #6f42c1; background: rgba(111,66,193,.12); }
+  .o_tm_kpi_title i { color: rgba(255,255,255,.95); background: rgba(255,255,255,.22); }
+  .o_tm_info_title i { color: #6f42c1; background: rgba(111,66,193,.12); }
+
+  .btn i {
+    background: transparent;
+    color: inherit;
+    animation: none !important;
+    transform: none !important;
+    padding: 0;
+    margin-right: 6px;
+    border-radius: 0;
+  }
+
+  .o_tm_kpi_tile:hover .o_tm_kpi_title i,
+  .o_tm_info_tile:hover .o_tm_info_title i,
+  .tm_panel:hover .tm_panel_title i {
+    color: #4f46e5;
+    background: rgba(79,70,229,.18);
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+  }
+
+  /* =====================================================
+     ✅ Executive-style CHART PANELS (this is the main change)
+     Use:
+       <div class="tm_panel"> ... </div>
+       <div class="tm_panel_head"> ... </div>
+       <div class="tm_panel_title"> ... </div>
+       <div class="tm_panel_tools"> ... </div>
+     ===================================================== */
+
+  .tm_panel {
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    padding: 12px;
+    overflow-x: auto;
+    position: relative;
+    animation: tmFloatProd 7.0s ease-in-out infinite, tmGlowProd 7.0s ease-in-out infinite;
+    transition: transform .18s ease, box-shadow .18s ease;
+  }
+
+  .tm_panel:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 26px rgba(0,0,0,.10);
+  }
+
+  .tm_panel_head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+
+  .tm_panel_title {
+    font-weight: 900;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .tm_panel_tools {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  /* ✅ Make the chart pills look like Executive */
+  .tm_panel_tools .btn-group.btn-group-sm .btn,
+  .tm_panel_tools .btn {
+    border-radius: 8px !important;
+    font-weight: 900;
+    font-size: 12px;
+    padding: 6px 10px;
+    line-height: 1;
+    transition: transform .12s ease, box-shadow .12s ease;
+  }
+
+  .tm_panel_tools .btn:hover { transform: translateY(-1px); }
+  .tm_panel_tools .btn.active,
+  .tm_panel_tools .btn:active {
+    box-shadow: inset 0 0 0 2px rgba(79,70,229,.18);
+  }
+
+  /* ✅ Chart height fix (no more “thin strip”) */
+  .tm_chart_box {
+    height: 280px;
+    position: relative;
+  }
+
+  .tm_chart_box canvas {
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  /* ✅ Empty state helper */
+  .tm_empty {
+    padding: 14px;
+    border-radius: 12px;
+    background: rgba(0,0,0,0.03);
+    color: rgba(0,0,0,0.55);
+    font-size: 13px;
+  }
+
+  /* =====================================================
+     Existing animations (unchanged)
+     ===================================================== */
+  .o_tm_kpi_tile,
+  .o_tm_info_tile,
+  .alert,
+  .table-responsive,
+  .border.rounded.p-2 {
+    animation: tmSlideUp .55s cubic-bezier(.2,.9,.2,1) both;
+  }
+
+  .o_tm_kpi_title i,
+  .o_tm_info_title i,
+  .tm_panel_title i {
+    animation: tmIconPop .45s ease-out both;
+    animation-delay: .12s;
+  }
+
+  /* =====================================================
+     KPI TILES (unchanged, only slight polish)
+     ===================================================== */
+  .o_tm_kpi_tile {
+    border-radius: 10px;
+    padding: 16px;
+    color: #fff;
+    min-height: 120px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    position: relative;
+    overflow: hidden;
+
+    animation: tmFloatProd 3.2s ease-in-out infinite, tmGlowProd 3.2s ease-in-out infinite;
+
+    .o_tm_kpi_top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .o_tm_kpi_title {
+      font-weight: 700;
+      font-size: 14px;
+      letter-spacing: .2px;
+
+      i{ display:inline-block; animation: tmIconBounceProd 1.2s ease-in-out infinite; }
+    }
+
+    .o_tm_kpi_tag {
+      font-size: 12px;
+      opacity: .92;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.15);
+      border: 1px solid rgba(255,255,255,.18);
+    }
+
+    .o_tm_kpi_value { font-size: 44px; font-weight: 900; line-height: 1; margin: 8px 0; letter-spacing: -0.5px; }
+    .o_tm_kpi_sub { font-size: 12px; opacity: .9; }
+
+    &::after{
+      content:"";
+      position:absolute;
+      top:-55%;
+      left:-75%;
+      width:65%;
+      height:210%;
+      background: linear-gradient(
+        115deg,
+        transparent 0%,
+        rgba(255,255,255,.12) 18%,
+        rgba(255,255,255,.90) 45%,
+        rgba(255,255,255,.12) 72%,
+        transparent 100%
+      );
+      transform: translateX(-160%) skewX(-10deg);
+      opacity: 0;
+      pointer-events: none;
+      mix-blend-mode: overlay;
+      animation: tmShimmerProd 2.35s ease-in-out infinite;
+    }
+  }
+
+  .o_tm_kpi_green  { background: #118a3b; }
+  .o_tm_kpi_orange { background: #b97a00; }
+  .o_tm_kpi_red    { background: #c62828; }
+  .o_tm_kpi_blue   { background: #1565c0; }
+
+  /* =====================================================
+     INFO TILES
+     ===================================================== */
+  .o_tm_info_tile {
+    border-radius: 10px;
+    padding: 16px;
+    min-height: 105px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.06);
+
+    animation: tmFloatProd 4.8s ease-in-out infinite, tmGlowProd 4.8s ease-in-out infinite;
+
+    .o_tm_info_title {
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 6px;
+
+      i{ display:inline-block; animation: tmIconBounceProd 1.25s ease-in-out infinite; }
+    }
+
+    .o_tm_info_value { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+    .o_tm_info_sub { font-size: 12px; opacity: .9; }
+  }
+
+  .o_tm_info_yellow { background: #fff3cd; color: #533f03; }
+  .o_tm_info_gray   { background: #f4f6f8; color: #1f2937; }
+  .o_tm_info_red    { background: #ffe5e5; color: #7a1a1a; }
+
+  .o_tm_info_red {
+    animation: tmFloatProd 4.8s ease-in-out infinite, tmGlowProd 4.8s ease-in-out infinite, tmPulseGlowRed 2.2s infinite;
+  }
+
+  .o_tm_info_yellow[role="button"] {
+    animation: tmFloatProd 5.4s ease-in-out infinite, tmGlowProd 5.4s ease-in-out infinite, tmPulseGlowYellow 3.0s infinite;
+  }
+
+  /* =====================================================
+     Responsive + reduced motion
+     ===================================================== */
+  @media (max-width: 768px) {
+    .o_tm_kpi_tile .o_tm_kpi_value { font-size: 34px; }
+    .o_tm_card_h { min-height: auto; }
+    .tm_chart_box { height: 240px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .o_tm_kpi_tile,
+    .o_tm_kpi_tile::after,
+    .o_tm_info_tile,
+    .tm_panel,
+    .alert,
+    .table-responsive,
+    .btn,
+    .o_tm_kpi_title i,
+    .o_tm_info_title i,
+    .tm_panel_title i {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+}

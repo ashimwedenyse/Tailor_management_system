@@ -1,0 +1,609 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+  <t t-name="tailor_management.TailorShowroomDashboard">
+    <div class="o_tailor_exec_dashboard p-3 o_tm_dash_root">
+
+      <!-- Header / ribbon -->
+      <div class="o_tm_ribbon">
+        <div class="o_tm_ribbon_left">
+          <h2 class="m-0">
+            <i class="fa fa-store me-2"></i>Showroom Dashboard
+          </h2>
+        </div>
+
+        <div class="o_tm_ribbon_center">
+          <button class="o_tm_ribbon_btn" t-on-click="() => goDashboard('executive')">
+            <i class="fa fa-line-chart me-2"></i>Executive
+          </button>
+          <button class="o_tm_ribbon_btn active" t-on-click="() => goDashboard('showroom')">
+            <i class="fa fa-store me-2"></i>Showroom
+          </button>
+          <button class="o_tm_ribbon_btn" t-on-click="() => goDashboard('production')">
+            <i class="fa fa-industry me-2"></i>Production
+          </button>
+        </div>
+
+        <div class="o_tm_ribbon_right">
+          <div class="d-flex gap-2 align-items-end flex-wrap">
+
+            <!-- ✅ Range picker (Today / 7d / 30d / Custom) -->
+            <div class="tm_range_bar">
+              <button class="tm_range_btn"
+                      t-att-class="state.filters.range === 'today' ? 'tm_range_btn active' : 'tm_range_btn'"
+                      t-on-click="() => setRange('today')">
+                Today
+              </button>
+              <button class="tm_range_btn"
+                      t-att-class="state.filters.range === '7d' ? 'tm_range_btn active' : 'tm_range_btn'"
+                      t-on-click="() => setRange('7d')">
+                7 Days
+              </button>
+              <button class="tm_range_btn"
+                      t-att-class="state.filters.range === '30d' ? 'tm_range_btn active' : 'tm_range_btn'"
+                      t-on-click="() => setRange('30d')">
+                30 Days
+              </button>
+              <button class="tm_range_btn"
+                      t-att-class="state.filters.range === 'custom' ? 'tm_range_btn active' : 'tm_range_btn'"
+                      t-on-click="() => setRange('custom')">
+                Custom
+              </button>
+            </div>
+
+            <div>
+              <label class="form-label mb-0">From</label>
+              <input type="date" class="form-control"
+                     t-model="state.filters.date_from"
+                     t-att-disabled="state.filters.range !== 'custom'"/>
+            </div>
+            <div>
+              <label class="form-label mb-0">To</label>
+              <input type="date" class="form-control"
+                     t-model="state.filters.date_to"
+                     t-att-disabled="state.filters.range !== 'custom'"/>
+            </div>
+            <div>
+              <button class="btn btn-primary"
+                      t-on-click="applyFilters"
+                      t-att-disabled="state.filters.range !== 'custom'">
+                <i class="fa fa-filter me-1"></i>Apply
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ✅ SCROLL AREA START -->
+      <div class="o_tm_dash_scroll">
+
+        <t t-if="state.loading">
+          <div class="alert alert-info">
+            <i class="fa fa-spinner fa-spin me-2"></i>Loading Showroom KPIs…
+          </div>
+        </t>
+
+        <t t-else="">
+          <t t-set="k" t-value="state.data.kpis"/>
+          <t t-set="date_label"
+             t-value="(state.filters.date_from ? state.filters.date_from : '-') + ' → ' + (state.filters.date_to ? state.filters.date_to : '-')"/>
+
+          <div class="row g-3">
+
+            <div class="col-12 col-lg-9">
+
+              <!-- ===================================================== -->
+              <!-- ✅ SALES KPI CARDS (KEEP AS-IS)                        -->
+              <!-- ===================================================== -->
+              <div class="row g-3 mb-3">
+
+                <div class="col-12 col-md-3">
+                  <div class="card shadow-sm h-100 tm_kpi_tile tm_kpi_green"
+                       role="button" tabindex="0"
+                       t-on-click="openNewOrdersToday">
+                    <div class="card-body tm_kpi_card">
+                      <div class="tm_kpi_head">
+                        <div class="tm_kpi_title">
+                          <i class="fa fa-plus-circle me-2"></i>New Orders Today
+                        </div>
+                        <div class="tm_kpi_fromto">Today</div>
+                      </div>
+                      <div class="tm_kpi_value">
+                        <a href="#" t-on-click.stop.prevent="openNewOrdersToday">
+                          <t t-esc="k.new_orders_today"/>
+                        </a>
+                      </div>
+                      <div class="tm_kpi_sub">
+                        <i class="fa fa-file-text-o me-2"></i>Sale Orders created today
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-3">
+                  <div class="card shadow-sm h-100 tm_kpi_tile tm_kpi_green"
+                       role="button" tabindex="0"
+                       t-on-click="() => openSaleOrders([])">
+                    <div class="card-body tm_kpi_card">
+                      <div class="tm_kpi_head">
+                        <div class="tm_kpi_title">
+                          <i class="fa fa-list-alt me-2"></i>Total Orders
+                        </div>
+                        <div class="tm_kpi_fromto"><t t-esc="date_label"/></div>
+                      </div>
+                      <div class="tm_kpi_value">
+                        <a href="#" t-on-click.stop.prevent="() => openSaleOrders([])">
+                          <t t-esc="k.total_orders"/>
+                        </a>
+                      </div>
+                      <div class="tm_kpi_sub">
+                        <i class="fa fa-bars me-2"></i>All sales orders
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-3">
+                  <div class="card shadow-sm h-100 tm_kpi_tile tm_kpi_orange"
+                       role="button" tabindex="0"
+                       t-on-click="openPendingQuotations">
+                    <div class="card-body tm_kpi_card">
+                      <div class="tm_kpi_head">
+                        <div class="tm_kpi_title">
+                          <i class="fa fa-file-text me-2"></i>Pending Quotations
+                        </div>
+                        <div class="tm_kpi_fromto"><t t-esc="date_label"/></div>
+                      </div>
+                      <div class="tm_kpi_value">
+                        <a href="#" t-on-click.stop.prevent="openPendingQuotations">
+                          <t t-esc="k.pending_quotations"/>
+                        </a>
+                      </div>
+                      <div class="tm_kpi_sub">
+                        <i class="fa fa-envelope-o me-2"></i>Draft + Sent
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-3">
+                  <div class="card shadow-sm h-100 tm_kpi_tile tm_kpi_orange"
+                       role="button" tabindex="0"
+                       t-on-click="() => openSaleOrders([['state','=','sale']])">
+                    <div class="card-body tm_kpi_card">
+                      <div class="tm_kpi_head">
+                        <div class="tm_kpi_title">
+                          <i class="fa fa-check-circle me-2"></i>Confirmed
+                        </div>
+                        <div class="tm_kpi_fromto"><t t-esc="date_label"/></div>
+                      </div>
+                      <div class="tm_kpi_value">
+                        <a href="#" t-on-click.stop.prevent="() => openSaleOrders([['state','=','sale']])">
+                          <t t-esc="k.confirmed_orders"/>
+                        </a>
+                      </div>
+                      <div class="tm_kpi_sub">
+                        <i class="fa fa-check me-2"></i>Confirmed orders
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-3">
+                  <div class="card shadow-sm h-100 tm_kpi_tile tm_kpi_orange"
+                       role="button" tabindex="0"
+                       t-on-click="() => openSaleOrders([['picking_ids.state','=','assigned']])">
+                    <div class="card-body tm_kpi_card">
+                      <div class="tm_kpi_head">
+                        <div class="tm_kpi_title">
+                          <i class="fa fa-truck me-2"></i>Ready Delivery
+                        </div>
+                        <div class="tm_kpi_fromto"><t t-esc="date_label"/></div>
+                      </div>
+                      <div class="tm_kpi_value">
+                        <a href="#" t-on-click.stop.prevent="() => openSaleOrders([['picking_ids.state','=','assigned']])">
+                          <t t-esc="k.ready_delivery_orders"/>
+                        </a>
+                      </div>
+                      <div class="tm_kpi_sub">
+                        <i class="fa fa-clock-o me-2"></i>Ready to ship / deliver
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-3">
+                  <div class="card shadow-sm h-100 tm_kpi_tile tm_kpi_blue"
+                       role="button" tabindex="0"
+                       t-on-click="() => openSaleOrders([['state','=','sale']])">
+                    <div class="card-body tm_kpi_card">
+                      <div class="tm_kpi_head">
+                        <div class="tm_kpi_title">
+                          <i class="fa fa-percent me-2"></i>Conversion Rate
+                        </div>
+                        <div class="tm_kpi_fromto"><t t-esc="date_label"/></div>
+                      </div>
+                      <div class="tm_kpi_value">
+                        <t t-esc="k.showroom_conversion_rate"/>%
+                      </div>
+                      <div class="tm_kpi_sub">
+                        <i class="fa fa-tag me-2"></i>Avg order: <t t-esc="k.avg_order_value"/>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- ===================================================== -->
+              <!-- ✅ FINANCE / COMPLIANCE ROW (KEEP)                     -->
+              <!-- ===================================================== -->
+              <div class="row g-3 mb-3">
+                <div class="col-12 col-md-4">
+                  <div class="card shadow-sm h-100 tm_kpi_tile tm_kpi_blue">
+                    <div class="card-body">
+                      <div class="text-muted">
+                        <i class="fa fa-money me-2"></i>Total Revenue
+                      </div>
+                      <div class="fs-3 fw-bold"><t t-esc="k.total_revenue"/></div>
+                      <div class="text-muted small">VAT: <t t-esc="k.total_vat"/></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <div class="card shadow-sm h-100 tm_kpi_tile tm_kpi_orange">
+                    <div class="card-body">
+                      <div class="text-muted">
+                        <i class="fa fa-credit-card me-2"></i>Balance Due
+                      </div>
+                      <div class="fs-3 fw-bold"><t t-esc="k.total_balance_due"/></div>
+                      <div class="text-muted small">Unpaid / partial invoices</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-12 col-md-4">
+                  <div class="card shadow-sm h-100 tm_kpi_tile tm_kpi_red"
+                       role="button" tabindex="0"
+                       t-on-click="openMissingDocs">
+                    <div class="card-body">
+                      <div class="text-muted">
+                        <i class="fa fa-exclamation-triangle me-2"></i>Missing Docs
+                      </div>
+                      <div class="fs-3 fw-bold">
+                        <a href="#" t-on-click.stop.prevent="openMissingDocs">
+                          <t t-esc="k.missing_docs"/>
+                        </a>
+                      </div>
+                      <div class="text-muted small">Cancelled: <t t-esc="k.cancelled_orders"/></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ===================================================== -->
+              <!-- ✅ CHARTS/TABLES (IMPROVED - SELECTOR + CANVAS)        -->
+              <!-- ===================================================== -->
+              <div class="row g-3">
+
+                <!-- Sales Performance -->
+                <div class="col-12 col-lg-6">
+                  <div class="card shadow-sm h-100 tm_chart_card">
+                    <div class="card-body">
+
+                      <div class="tm_chart_header">
+                        <div class="fw-bold">
+                          <i class="fa fa-bar-chart me-2"></i>Sales Performance (Confirmed)
+                        </div>
+
+                        <div class="tm_chart_tools">
+                          <div class="tm_view_pills">
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.sales_performance === 'table') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('sales_performance','table')">
+                              Table
+                            </button>
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.sales_performance === 'bar') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('sales_performance','bar')">
+                              Bar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Chart -->
+                      <t t-if="state.ui.chart_view.sales_performance !== 'table'">
+                        <div class="tm_chart_canvas_wrap">
+                          <canvas t-ref="salesPerfCanvas" class="tm_chart_canvas"></canvas>
+                        </div>
+                      </t>
+
+                      <!-- Table (fallback always available) -->
+                      <t t-if="state.ui.chart_view.sales_performance === 'table'">
+                        <table class="table table-sm tm_table_compact">
+                          <tbody>
+                            <t t-foreach="(state.data.charts.sales_performance || [])" t-as="r" t-key="r.label">
+                              <tr>
+                                <td><t t-esc="r.label"/></td>
+                                <td class="text-end"><t t-esc="r.value"/></td>
+                              </tr>
+                            </t>
+                          </tbody>
+                        </table>
+                      </t>
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Orders by Status -->
+                <div class="col-12 col-lg-6">
+                  <div class="card shadow-sm h-100 tm_chart_card">
+                    <div class="card-body">
+
+                      <div class="tm_chart_header">
+                        <div class="fw-bold">
+                          <i class="fa fa-pie-chart me-2"></i>Orders by Status (Sales)
+                        </div>
+
+                        <div class="tm_chart_tools">
+                          <div class="tm_view_pills">
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.orders_by_status === 'table') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('orders_by_status','table')">
+                              Table
+                            </button>
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.orders_by_status === 'donut') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('orders_by_status','donut')">
+                              Donut
+                            </button>
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.orders_by_status === 'bar') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('orders_by_status','bar')">
+                              Bar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Chart -->
+                      <t t-if="state.ui.chart_view.orders_by_status !== 'table'">
+                        <div class="tm_chart_canvas_wrap">
+                          <canvas t-ref="ordersByStatusCanvas" class="tm_chart_canvas"></canvas>
+                        </div>
+                      </t>
+
+                      <!-- Table (your original logic kept) -->
+                      <t t-if="state.ui.chart_view.orders_by_status === 'table'">
+                        <table class="table table-sm tm_table_compact">
+                          <tbody>
+                            <t t-foreach="(state.data.charts.orders_by_status || [])" t-as="r" t-key="r.label">
+
+                              <!-- ✅ FIX: allow English + Arabic labels -->
+                              <t t-if="[
+                                'Draft','Quotation','Pending Quotations','Confirmed','Ready Delivery','Ready for Delivery','Delivered','Cancelled',
+                                'مسودة','عرض سعر','عروض أسعار معلّقة','مؤكد','جاهز للتسليم','تم التسليم','ملغي'
+                              ].includes(r.label)">
+
+                                <tr role="button" tabindex="0"
+                                    t-on-click="() => openSaleOrders(
+                                      (r.label === 'Delivered' || r.label === 'تم التسليم') ? [['picking_ids.state','=','done']] :
+                                      (r.label === 'Ready Delivery' || r.label === 'Ready for Delivery' || r.label === 'جاهز للتسليم') ? [['picking_ids.state','=','assigned']] :
+                                      (r.label === 'Confirmed' || r.label === 'مؤكد') ? [['state','=','sale']] :
+                                      (r.label === 'Draft' || r.label === 'Quotation' || r.label === 'Pending Quotations' || r.label === 'مسودة' || r.label === 'عرض سعر' || r.label === 'عروض أسعار معلّقة') ? [['state','in',['draft','sent']]] :
+                                      (r.label === 'Cancelled' || r.label === 'ملغي') ? [['state','=','cancel']] :
+                                      []
+                                    )">
+                                  <td><t t-esc="r.label"/></td>
+                                  <td class="text-end">
+                                    <a href="#" t-on-click.stop.prevent="() => openSaleOrders(
+                                      (r.label === 'Delivered' || r.label === 'تم التسليم') ? [['picking_ids.state','=','done']] :
+                                      (r.label === 'Ready Delivery' || r.label === 'Ready for Delivery' || r.label === 'جاهز للتسليم') ? [['picking_ids.state','=','assigned']] :
+                                      (r.label === 'Confirmed' || r.label === 'مؤكد') ? [['state','=','sale']] :
+                                      (r.label === 'Draft' || r.label === 'Quotation' || r.label === 'Pending Quotations' || r.label === 'مسودة' || r.label === 'عرض سعر' || r.label === 'عروض أسعار معلّقة') ? [['state','in',['draft','sent']]] :
+                                      (r.label === 'Cancelled' || r.label === 'ملغي') ? [['state','=','cancel']] :
+                                      []
+                                    )">
+                                      <t t-esc="r.value"/>
+                                    </a>
+                                  </td>
+                                </tr>
+                              </t>
+                            </t>
+                          </tbody>
+                        </table>
+                      </t>
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Orders Trend -->
+                <div class="col-12 col-lg-6">
+                  <div class="card shadow-sm h-100 tm_chart_card">
+                    <div class="card-body">
+
+                      <div class="tm_chart_header">
+                        <div class="fw-bold">
+                          <i class="fa fa-line-chart me-2"></i>Orders Trend (by Month)
+                        </div>
+
+                        <div class="tm_chart_tools">
+                          <div class="tm_view_pills">
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.orders_by_month === 'table') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('orders_by_month','table')">
+                              Table
+                            </button>
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.orders_by_month === 'line') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('orders_by_month','line')">
+                              Line
+                            </button>
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.orders_by_month === 'bar') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('orders_by_month','bar')">
+                              Bar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <t t-if="state.ui.chart_view.orders_by_month !== 'table'">
+                        <div class="tm_chart_canvas_wrap">
+                          <canvas t-ref="ordersByMonthCanvas" class="tm_chart_canvas"></canvas>
+                        </div>
+                      </t>
+
+                      <t t-if="state.ui.chart_view.orders_by_month === 'table'">
+                        <table class="table table-sm tm_table_compact">
+                          <tbody>
+                            <t t-foreach="(state.data.charts.orders_by_month || [])" t-as="r" t-key="r.label">
+                              <tr>
+                                <td><t t-esc="r.label"/></td>
+                                <td class="text-end"><t t-esc="r.value"/></td>
+                              </tr>
+                            </t>
+                          </tbody>
+                        </table>
+                      </t>
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Revenue Trend -->
+                <div class="col-12 col-lg-6">
+                  <div class="card shadow-sm h-100 tm_chart_card">
+                    <div class="card-body">
+
+                      <div class="tm_chart_header">
+                        <div class="fw-bold">
+                          <i class="fa fa-area-chart me-2"></i>Revenue Trend (by Month)
+                        </div>
+
+                        <div class="tm_chart_tools">
+                          <div class="tm_view_pills">
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.revenue_by_month === 'table') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('revenue_by_month','table')">
+                              Table
+                            </button>
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.revenue_by_month === 'line') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('revenue_by_month','line')">
+                              Line
+                            </button>
+                            <button class="tm_pill"
+                                    t-att-class="(state.ui.chart_view.revenue_by_month === 'area') ? 'tm_pill active' : 'tm_pill'"
+                                    t-on-click="() => setChartView('revenue_by_month','area')">
+                              Area
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <t t-if="state.ui.chart_view.revenue_by_month !== 'table'">
+                        <div class="tm_chart_canvas_wrap">
+                          <canvas t-ref="revenueByMonthCanvas" class="tm_chart_canvas"></canvas>
+                        </div>
+                      </t>
+
+                      <t t-if="state.ui.chart_view.revenue_by_month === 'table'">
+                        <table class="table table-sm tm_table_compact">
+                          <tbody>
+                            <t t-foreach="(state.data.charts.revenue_by_month || [])" t-as="r" t-key="r.label">
+                              <tr>
+                                <td><t t-esc="r.label"/></td>
+                                <td class="text-end"><t t-esc="r.value"/></td>
+                              </tr>
+                            </t>
+                          </tbody>
+                        </table>
+                      </t>
+
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Top Models (keep table only for now - safe) -->
+                <div class="col-12">
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <div class="fw-bold mb-2">
+                        <i class="fa fa-star me-2"></i>Top Models (Qty)
+                      </div>
+                      <table class="table table-sm tm_table_compact">
+                        <tbody>
+                          <t t-foreach="(state.data.charts.top_models || [])" t-as="r" t-key="r.label">
+                            <tr>
+                              <td><t t-esc="r.label"/></td>
+                              <td class="text-end"><t t-esc="r.value"/></td>
+                            </tr>
+                          </t>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+            </div>
+
+            <!-- Right side -->
+            <div class="col-12 col-lg-3">
+              <div class="card shadow-sm tm_side_panel">
+                <div class="card-body">
+                  <div class="fw-bold mb-2">
+                    <i class="fa fa-shopping-cart me-2"></i>Sales
+                  </div>
+
+                  <div class="tm_side_item" t-on-click="() => openSaleOrders([])">
+                    <span><i class="fa fa-shopping-basket me-2"></i>Orders</span>
+                    <span class="ms-auto fw-bold"><t t-esc="k.total_orders"/></span>
+                  </div>
+
+                  <div class="tm_side_item" t-on-click="openNewOrdersToday">
+                    <span><i class="fa fa-plus-circle me-2"></i>New Orders Today</span>
+                    <span class="ms-auto fw-bold"><t t-esc="k.new_orders_today"/></span>
+                  </div>
+
+                  <div class="tm_side_item" t-on-click="openPendingQuotations">
+                    <span><i class="fa fa-file-text me-2"></i>Pending Quotations</span>
+                    <span class="ms-auto fw-bold"><t t-esc="k.pending_quotations"/></span>
+                  </div>
+
+                  <div class="tm_side_item" t-on-click="openMissingDocs">
+                    <span><i class="fa fa-exclamation-triangle me-2"></i>Missing Docs</span>
+                    <span class="ms-auto fw-bold"><t t-esc="k.missing_docs"/></span>
+                  </div>
+
+                  <div class="tm_side_item" t-on-click="() => openSaleOrders([['picking_ids.state','=','assigned']])">
+                    <span><i class="fa fa-truck me-2"></i>Ready Delivery</span>
+                    <span class="ms-auto fw-bold"><t t-esc="k.ready_delivery_orders"/></span>
+                  </div>
+
+                  <div class="tm_side_item" t-on-click="openDeliveredOrders">
+                    <span><i class="fa fa-check-circle me-2"></i>Delivered</span>
+                    <span class="ms-auto fw-bold"><t t-esc="k.delivered_orders"/></span>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+        </t>
+      </div>
+      <!-- ✅ SCROLL AREA END -->
+
+    </div>
+  </t>
+
+</templates>

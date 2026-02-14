@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <record id="view_res_config_settings_inherit_tailor_ai" model="ir.ui.view">
+    <field name="name">res.config.settings.inherit.tailor.ai</field>
+    <field name="model">res.config.settings</field>
+    <!-- Odoo 19: inherit the base Settings form -->
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+
+      <!-- Odoo 19 Settings uses app/settings blocks; insert inside the form -->
+      <xpath expr="//form" position="inside">
+        <app string="Tailor" name="tailor_app">
+          <block title="Tailor AI" name="tailor_ai_block">
+            <setting string="AI Service URL" help="Base URL of the AI service (FastAPI). Example: http://127.0.0.1:8008">
+              <field name="tailor_ai_service_url" placeholder="http://127.0.0.1:8008"/>
+            </setting>
+
+            <setting string="AI Token" help="Bearer token used by Odoo to authenticate with the AI service. Must match AI_TOKEN on the AI service.">
+              <field name="tailor_ai_token" password="True" placeholder="change-me"/>
+            </setting>
+          </block>
+        </app>
+      </xpath>
+
+    </field>
+  </record>
+</odoo>
+

@@ -1,0 +1,245 @@
+<odoo>
+    <record id="view_mrp_production_form_tailor" model="ir.ui.view">
+        <field name="name">mrp.production.form.tailor</field>
+        <field name="model">mrp.production</field>
+        <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
+        <field name="arch" type="xml">
+
+            <xpath expr="//form/header" position="inside">
+
+                <field name="tailor_status" widget="statusbar"
+                       statusbar_visible="draft,confirmed,cutting,sewing,qc,ready_delivery,delivered,cancel"
+                       invisible="not is_tailoring_order"/>
+
+                <button name="action_mo_cutting" type="object"
+                        string="Ready for Cutting"
+                        class="btn-secondary"
+                        invisible="not is_tailoring_order or tailor_status in ('qc','ready_delivery','delivered','cancel')
+                                   or not stock_checked or not admin_materials_approved"/>
+
+                <button name="action_mo_sewing" type="object"
+                        string="Sewing"
+                        class="btn-secondary"
+                        invisible="not is_tailoring_order or tailor_status != 'cutting'
+                                   or not stock_checked or not admin_materials_approved"/>
+
+                <button name="action_send_to_admin" type="object"
+                        string="Send to Admin"
+                        class="btn-primary"
+                        invisible="not is_tailoring_order or tailor_status != 'sewing'
+                                   or not stock_checked or not admin_materials_approved"/>
+
+                <!-- ✅ Materials Gate Warning (blocks tailoring buttons until Stock+Admin approvals) -->
+                <div class="oe_inline"
+                     invisible="not is_tailoring_order or (stock_checked and admin_materials_approved)">
+                    <span class="badge text-bg-danger">
+                        MATERIALS NOT APPROVED – Stock Manager must check availability and a Manager must approve
+                    </span>
+                </div>
+
+                <!-- ✅ QC Gate Warning (shows only during QC if not approved) -->
+                <div class="oe_inline"
+                     invisible="not is_tailoring_order or tailor_status != 'qc' or qc_approved">
+                    <span class="badge text-bg-warning">
+                        QC NOT APPROVED – Manager must approve before completion
+                    </span>
+                </div>
+
+                <!-- ✅ QC Approved Badge (shows only when approved) -->
+                <div class="oe_inline"
+                     invisible="not is_tailoring_order or not qc_approved">
+                    <span class="badge text-bg-success">
+                        QC APPROVED
+                    </span>
+                </div>
+
+            </xpath>
+
+            <xpath expr="//sheet/notebook" position="inside">
+
+                <page string="Tailoring" invisible="not is_tailoring_order">
+                    <group col="4">
+                        <group string="Order Link">
+                            <field name="tailor_order_id" options="{'no_create': True}"/>
+                            <field name="sale_order_id" options="{'no_create': True}"/>
+                            <field name="partner_id" options="{'no_create': True}"/>
+                            <field name="delivery_date"/>
+                        </group>
+
+                        <group string="Production">
+                            <field name="product_id" options="{'no_create': True}"/>
+                            <field name="product_qty" readonly="1"/>
+                            <field name="state" readonly="1"/>
+                            <field name="tailor_status" readonly="1"/>
+                        </group>
+
+                        <group string="Assignment">
+                            <field name="tailor_id" options="{'no_create': True}"/>
+                            <field name="garment_template" readonly="1"/>
+                            <field name="is_tailoring_order" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <separator string="Measurement Diagram"/>
+
+                    <group col="1">
+                        <div style="width:100%; display:flex; justify-content:center;">
+                            <field name="measurement_diagram"
+                                   widget="image"
+                                   nolabel="1"
+                                   options="{'preview_image': 'measurement_diagram'}"
+                                   style="max-height:750px; width:auto;"/>
+                        </div>
+                        <div class="o_form_label">Tip: click the image to preview/zoom.</div>
+                    </group>
+                </page>
+
+                <page string="Measurements" invisible="not is_tailoring_order">
+                    <group string="Body Measurements" col="4">
+                        <field name="length"/>
+                        <field name="shoulder"/>
+                        <field name="sleeve_length"/>
+                        <field name="chest"/>
+                        <field name="waist"/>
+                        <field name="hip"/>
+                        <field name="neck"/>
+                        <field name="bottom_width"/>
+                    </group>
+
+                    <separator string="Preferences &amp; Notes"/>
+
+                    <group col="4">
+                        <group string="Preferences" col="2">
+                            <field name="to_fabric_preference"/>
+                            <field name="to_fitting_style"/>
+                        </group>
+
+                        <group string="Notes" col="2">
+                            <field name="to_style_preference"/>
+                            <field name="to_measurement_notes"/>
+                        </group>
+                    </group>
+                </page>
+
+                <page string="Style" invisible="not is_tailoring_order">
+                    <group col="4">
+                        <group string="Design" col="2">
+                            <field name="front_design"/>
+                            <field name="sleeve_style"/>
+                            <field name="collar_style"/>
+                            <field name="cuff_style"/>
+                        </group>
+
+                        <group string="Finish" col="2">
+                            <field name="buttons_type"/>
+                            <field name="stitching_type"/>
+                        </group>
+                    </group>
+
+                    <separator string="Pockets"/>
+
+                    <group col="4">
+                        <field name="pocket_pen_big"/>
+                        <field name="pocket_pen_small"/>
+                        <field name="pocket_front"/>
+                        <field name="pocket_key_left"/>
+                        <field name="pocket_key_right"/>
+                    </group>
+                </page>
+
+                <!-- ✅ NEW: Quality Inspection page (readonly; manager approves in Tailor Order) -->
+                <page string="Quality Inspection" invisible="not is_tailoring_order">
+                    <group col="4">
+                        <group string="QC Status">
+                            <field name="qc_approved" readonly="1"/>
+                        </group>
+
+                        <group string="Manager Comment">
+                            <field name="qc_manager_comment" readonly="1" placeholder="No comment yet..."/>
+                        </group>
+                    </group>
+
+                    <separator string="Note"/>
+
+                    <div class="text-muted">
+                        QC is approved by the manager in the Tailor Order. Production completion is blocked until QC is approved.
+                    </div>
+                </page>
+
+                <!-- ✅ FIXED: History now shows ALL measurements from Contacts -->
+                <page string="History" invisible="not is_tailoring_order">
+                    <field name="customer_measurement_history_ids" nolabel="1" readonly="1">
+                        <list>
+                            <field name="measurement_date"/>
+                            <field name="garment_template"/>
+                            <field name="length"/>
+                            <field name="shoulder"/>
+                            <field name="sleeve_length"/>
+                            <field name="chest"/>
+                            <field name="waist"/>
+                            <field name="hip"/>
+                            <field name="neck"/>
+                            <field name="bottom_width"/>
+                            <field name="fabric_preference"/>
+                            <field name="fitting_style"/>
+                        </list>
+
+                        <form>
+                            <sheet>
+                                <group col="4">
+                                    <group string="Info">
+                                        <field name="measurement_date"/>
+                                        <field name="garment_template"/>
+                                        <field name="sale_order_id"/>
+                                        <field name="mrp_id"/>
+                                    </group>
+
+                                    <group string="Body Measurements" col="4">
+                                        <field name="length"/>
+                                        <field name="shoulder"/>
+                                        <field name="sleeve_length"/>
+                                        <field name="chest"/>
+                                        <field name="waist"/>
+                                        <field name="hip"/>
+                                        <field name="neck"/>
+                                        <field name="bottom_width"/>
+                                    </group>
+                                </group>
+
+                                <separator string="Preferences &amp; Notes"/>
+
+                                <group col="4">
+                                    <group string="Preferences" col="2">
+                                        <field name="fabric_preference"/>
+                                        <field name="fitting_style"/>
+                                    </group>
+
+                                    <group string="Notes" col="2">
+                                        <field name="style_preference"/>
+                                        <field name="measurement_notes"/>
+                                    </group>
+                                </group>
+                            </sheet>
+                        </form>
+                    </field>
+                </page>
+
+            </xpath>
+
+
+            <!-- ✅ Hide standard MRP stock/availability buttons from Tailors -->
+            <xpath expr="//form/header/button[@name='action_assign']" position="attributes">
+                <attribute name="groups">stock.group_stock_manager,tailor_management.group_tailor_admin</attribute>
+            </xpath>
+            <xpath expr="//form/header/button[@name='button_plan']" position="attributes">
+                <attribute name="groups">stock.group_stock_manager,tailor_management.group_tailor_admin</attribute>
+            </xpath>
+            <xpath expr="//form/header/button[@name='button_unplan']" position="attributes">
+                <attribute name="groups">stock.group_stock_manager,tailor_management.group_tailor_admin</attribute>
+            </xpath>
+            <xpath expr="//form/header/button[@name='button_mark_done']" position="attributes">
+                <attribute name="groups">tailor_management.group_tailor_qc,stock.group_stock_manager,tailor_management.group_tailor_admin</attribute>
+            </xpath>
+        </field>
+    </record>
+</odoo>

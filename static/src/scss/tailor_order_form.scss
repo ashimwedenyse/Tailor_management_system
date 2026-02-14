@@ -1,0 +1,161 @@
+// Premium UI for Tailor Order form
+.o_form_view.tm_tailor_order_form {
+
+  // overall background feel
+  .o_form_sheet_bg {
+    background: #f6f7fb;
+  }
+
+  .o_form_sheet {
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.06);
+    padding-top: 14px;
+  }
+
+  // -------------------------
+  // Title / hero area
+  // -------------------------
+  .oe_title {
+    padding: 10px 10px 6px 10px;
+
+    h1 {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: .2px;
+      margin-bottom: 6px;
+    }
+
+    .tm_subtitle {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      color: #6b7280;
+      font-weight: 600;
+      margin-top: 4px;
+
+      i {
+        opacity: .85;
+      }
+    }
+  }
+
+  // -------------------------
+  // Smart buttons (stat buttons)
+  // -------------------------
+  .oe_button_box {
+    margin: 6px 8px 6px 8px !important;
+    gap: 10px;
+
+    .oe_stat_button {
+      border: 0 !important;
+      border-radius: 14px !important;
+      background: #ffffff !important;
+      box-shadow: 0 6px 18px rgba(0,0,0,.08) !important;
+      padding: 10px 14px !important;
+      transition: transform .15s ease, box-shadow .15s ease;
+      min-width: 150px;
+
+      &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 24px rgba(0,0,0,.12) !important;
+      }
+
+      .o_stat_info, .o_stat_text, .o_field_widget {
+        font-weight: 800;
+      }
+
+      i.fa {
+        font-size: 18px !important;
+        margin-right: 8px;
+        opacity: .9;
+      }
+
+      // make number bigger
+      .o_stat_value, .o_field_integer, .o_field_widget.o_stat_info {
+        font-size: 18px !important;
+        font-weight: 900 !important;
+      }
+
+      .o_stat_text {
+        font-size: 12px !important;
+        font-weight: 800 !important;
+        opacity: .75;
+        text-transform: uppercase;
+        letter-spacing: .4px;
+      }
+    }
+  }
+
+  // -------------------------
+  // Group headers / separators
+  // -------------------------
+  .o_group {
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 14px;
+    box-shadow: 0 6px 16px rgba(0,0,0,.06);
+    margin-bottom: 14px;
+  }
+
+  .o_group .o_group_name {
+    font-weight: 900;
+    letter-spacing: .3px;
+    color: #111827;
+    text-transform: uppercase;
+    font-size: 12px;
+    opacity: .9;
+  }
+
+  // -------------------------
+  // Notebook tabs premium
+  // -------------------------
+  .o_notebook {
+    margin-top: 10px;
+
+    .nav.nav-tabs {
+      border-bottom: 0;
+      gap: 8px;
+      padding: 6px 6px 0 6px;
+
+      .nav-link {
+        border: 0 !important;
+        border-radius: 999px !important;
+        background: #eef2ff;
+        font-weight: 800;
+        padding: 8px 14px;
+        transition: all .15s ease;
+
+        &:hover {
+          transform: translateY(-1px);
+        }
+
+        &.active {
+          background: #111827 !important;
+          color: #fff !important;
+          box-shadow: 0 10px 20px rgba(0,0,0,.12);
+        }
+      }
+    }
+
+    .tab-content {
+      padding: 10px 6px 6px 6px;
+    }
+  }
+
+  // -------------------------
+  // Embedded lists look cleaner
+  // -------------------------
+  .o_list_view {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 6px 16px rgba(0,0,0,.06);
+  }
+
+  // -------------------------
+  // Image field (diagram) nicer
+  // -------------------------
+  .o_field_image img {
+    border-radius: 14px;
+    box-shadow: 0 10px 24px rgba(0,0,0,.10);
+  }
+}

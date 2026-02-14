@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+  <!-- Client Action -->
+  <record id="action_tailor_ai_live_scanner" model="ir.actions.client">
+    <field name="name">AI Live Scanner</field>
+    <field name="tag">tailor_ai_live_scanner</field>
+  </record>
+
+  <!-- Server action for Contacts (res.partner): shows in Action menu -->
+  <record id="server_action_ai_live_partner" model="ir.actions.server">
+    <field name="name">AI Measure (Live Camera)</field>
+    <field name="model_id" ref="base.model_res_partner"/>
+    <field name="binding_model_id" ref="base.model_res_partner"/>
+    <field name="binding_view_types">form</field>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+action = {
+  "type": "ir.actions.client",
+  "tag": "tailor_ai_live_scanner",
+  "name": "AI Live Scanner",
+  "context": {"default_partner_id": record.id}
+}
+    ]]></field>
+  </record>
+
+  <!-- Server action for Tailor Order: shows in Action menu -->
+  <record id="server_action_ai_live_tailor_order" model="ir.actions.server">
+    <field name="name">AI Measure (Live Camera)</field>
+    <field name="model_id" ref="tailor_management.model_tailor_order"/>
+    <field name="binding_model_id" ref="tailor_management.model_tailor_order"/>
+    <field name="binding_view_types">form</field>
+    <field name="state">code</field>
+    <field name="code"><![CDATA[
+action = {
+  "type": "ir.actions.client",
+  "tag": "tailor_ai_live_scanner",
+  "name": "AI Live Scanner",
+  "context": {
+    "default_tailor_order_id": record.id,
+    "default_partner_id": record.partner_id.id if record.partner_id else False
+  }
+}
+    ]]></field>
+  </record>
+
+</odoo>

@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <data>
+
+        <record id="view_sale_order_form_tailor_minimal" model="ir.ui.view">
+            <field name="name">sale.order.form.tailor.minimal</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+
+                <!-- ================= HEADER BUTTON ================= -->
+                <xpath expr="//header" position="inside">
+                    <button name="action_create_advance_payment_invoice"
+                            type="object"
+                            string="Create Advance Invoice"
+                            class="btn-primary"
+                            invisible="state != 'draft' or advance_payment &lt;= 0 or not partner_id"/>
+                </xpath>
+
+                <!-- 1) Delivery Date (placed after Order Date) -->
+                <xpath expr="//field[@name='date_order']" position="after">
+                    <field name="delivery_date" string="Delivery Date"/>
+                </xpath>
+
+                <!-- 2) Put Payments fields inside the Order Lines notebook tab (safe anchor) -->
+                <xpath expr="//field[@name='order_line']" position="after">
+                    <group string="Payments" col="2">
+                        <field name="advance_payment" string="Advance Payment"/>
+                        <field name="remaining_amount" string="Remaining Amount" readonly="1"/>
+                    </group>
+                </xpath>
+
+                <!-- 3) Measurements Tab -->
+                <xpath expr="//notebook" position="inside">
+                    <page string="Measurements">
+                        <group>
+                            <button name="action_open_measurements_wizard"
+                                    type="object"
+                                    string="Add Measurement"
+                                    class="btn-primary"/>
+                        </group>
+
+                        <field name="measurements_ids"
+                               context="{'default_partner_id': partner_id, 'default_sale_order_id': id}"
+                               nolabel="1">
+
+                            <list string="Measurements" editable="bottom">
+                                <field name="measurement_date"/>
+                                <field name="garment_template"/>
+                                <field name="length"/>
+                                <field name="shoulder"/>
+                                <field name="sleeve_length"/>
+                                <field name="chest"/>
+                                <field name="waist"/>
+                                <field name="hip"/>
+                                <field name="neck"/>
+                                <field name="bottom_width"/>
+                            </list>
+
+                            <form string="Measurement">
+                                <sheet>
+                                    <group col="2">
+                                        <field name="partner_id" readonly="1"/>
+                                        <field name="sale_order_id" readonly="1"/>
+                                        <field name="measurement_date"/>
+                                        <field name="garment_template"/>
+                                    </group>
+
+                                    <group string="Body Measurements" col="4">
+                                        <field name="length"/>
+                                        <field name="shoulder"/>
+                                        <field name="sleeve_length"/>
+                                        <field name="chest"/>
+                                        <field name="waist"/>
+                                        <field name="hip"/>
+                                        <field name="neck"/>
+                                        <field name="bottom_width"/>
+                                    </group>
+
+                                    <group string="Notes" col="2">
+                                        <field name="fabric_preference"/>
+                                        <field name="style_preference"/>
+                                        <field name="fitting_style"/>
+                                        <field name="measurement_notes"/>
+                                    </group>
+                                </sheet>
+                            </form>
+
+                        </field>
+                    </page>
+                </xpath>
+
+            </field>
+        </record>
+
+    </data>
+</odoo>

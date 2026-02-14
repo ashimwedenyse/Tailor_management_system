@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+  <data>
+
+    <!-- Tailor Sales -->
+    <record id="group_tailor_sales" model="res.groups">
+      <field name="name">Tailor Sales</field>
+      <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Tailor -->
+    <record id="group_tailor_tailor" model="res.groups">
+      <field name="name">Tailor</field>
+      <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- QC -->
+    <record id="group_tailor_qc" model="res.groups">
+      <field name="name">Tailor QC</field>
+      <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+    </record>
+
+    <!-- Tailor Admin (implies all) -->
+    <record id="group_tailor_admin" model="res.groups">
+      <field name="name">Tailor Admin</field>
+      <field name="implied_ids" eval="[
+        (4, ref('tailor_management.group_tailor_sales')),
+        (4, ref('tailor_management.group_tailor_tailor')),
+        (4, ref('tailor_management.group_tailor_qc')),
+        (4, ref('base.group_system'))
+      ]"/>
+    </record>
+
+  </data>
+</odoo>

@@ -1,0 +1,799 @@
+/* ROOT scroll */
+.tm_dash_scroll{
+  height: calc(100vh - 120px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 14px 60px;
+}
+
+/* top modules bar */
+.tm_topbar{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom: 12px;
+}
+.tm_mod{
+  border:0;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-weight: 800;
+  color:#fff;
+}
+
+/* ✅ IMPORTANT: topbar icons should NOT move */
+.tm_mod i{
+  animation: none !important;
+  transform: none !important;
+}
+
+.tm_mod_olive{ background:#6d7f1a; }
+.tm_mod_gold{ background:#b08b00; }
+.tm_mod_green{ background:#1aa64b; }
+.tm_mod_teal{ background:#0aa6a6; }
+.tm_mod_blue{ background:#1273c6; }
+.tm_mod_navy{ background:#1d4f7a; }
+
+/* header line */
+.tm_header{
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  background:#fff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  margin-bottom: 12px;
+}
+
+/* body: main + sidebar */
+.tm_body{
+  display:grid;
+  grid-template-columns: 1fr 280px;
+  gap: 12px;
+}
+.tm_main{ min-width:0; }
+.tm_sidebar{
+  background:#fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  padding: 10px 12px;
+  height: fit-content;
+}
+.tm_sidebar_title{ font-weight:800; margin-bottom:10px; }
+.tm_side_list{ list-style:none; padding:0; margin:0; }
+.tm_side_list li{ padding:8px 0; border-bottom:1px solid #eee; }
+.tm_side_list li:last-child{ border-bottom:0; }
+
+/* KPI big tiles row */
+.tm_kpi_row{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.tm_kpi_row_3{
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* big colored tiles */
+.tm_tile{
+  border-radius: 8px;
+  color:#fff;
+  padding: 12px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.10);
+  position: relative; /* shimmer */
+  overflow: hidden;   /* shimmer */
+}
+
+/* ✅ CLICKABLE KPI CARDS */
+.tm_tile,
+.tm_cardbox{
+  cursor: pointer;
+}
+
+.tm_tile:hover,
+.tm_cardbox:hover{
+  transform: translateY(-1px);
+}
+
+.tm_tile:focus,
+.tm_cardbox:focus{
+  outline: 2px solid rgba(29,112,201,.35);
+  outline-offset: 2px;
+}
+
+/* tile content */
+.tm_tile_head{
+  display:flex;
+  justify-content: space-between;
+  align-items: center;
+  opacity:.95;
+}
+.tm_tile_title{ font-weight:800; font-size:13px; }
+.tm_tile_date{ font-size:12px; opacity:.85; }
+.tm_tile_value{
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1;
+  margin-top: 8px;
+}
+.tm_tile_value a{ color:#fff; text-decoration:none; }
+.tm_tile_foot{ margin-top: 8px; font-size: 12px; opacity:.9; }
+
+.tm_tile_green{ background: linear-gradient(90deg, #17a34a, #0f8a3c); }
+.tm_tile_orange{ background: linear-gradient(90deg, #d38a00, #b66f00); }
+.tm_tile_red{ background: linear-gradient(90deg, #d12a2a, #b21f1f); }
+.tm_tile_blue{ background: linear-gradient(90deg, #1d70c9, #165aa2); }
+
+/* small KPI boxes */
+.tm_cardbox{
+  background:#fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  padding: 12px;
+  position: relative; /* glow */
+}
+.tm_cardbox_title{ color:#6c757d; font-size: 13px; }
+.tm_cardbox_value{ font-size: 26px; font-weight: 900; }
+.tm_cardbox_sub{ color:#6c757d; font-size: 12px; margin-top: 4px; }
+
+/* profitability row enhancement */
+.tm_kpi_row_3 .tm_cardbox_value{
+  letter-spacing: .2px;
+}
+
+/* panels grid */
+.tm_grid{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.tm_panel{
+  background:#fff;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,.08);
+  padding: 12px;
+  overflow-x:auto;
+  position: relative; /* glow */
+}
+.tm_panel_full{ grid-column: 1 / -1; }
+.tm_panel_title{ font-weight: 900; margin-bottom: 8px; }
+
+/* prevent table overflow */
+.tm_panel table{
+  width: 100%;
+}
+.tm_panel td,
+.tm_panel th{
+  white-space: nowrap;
+}
+
+/* responsive */
+@media (max-width: 1200px){
+  .tm_body{ grid-template-columns: 1fr; }
+  .tm_kpi_row{ grid-template-columns: repeat(2, 1fr); }
+  .tm_kpi_row_3{ grid-template-columns: 1fr; }
+  .tm_grid{ grid-template-columns: 1fr; }
+}
+@media (max-width: 576px){
+  .tm_kpi_row{ grid-template-columns: 1fr; }
+  .tm_header{ flex-direction: column; align-items: stretch; }
+}
+
+/* ======================================================
+   FINAL ICON VISIBILITY POLISH (NO STRUCTURE CHANGE)
+   ====================================================== */
+
+/* make KPI icons clearer */
+.tm_tile_title i{
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+/* sidebar icons clearer */
+.tm_sidebar i{
+  color: #7c6bb3;
+  font-size: 14px;
+}
+
+/* financial KPI icons slightly highlighted */
+.tm_cardbox_title i{
+  color: #6f42c1;
+  font-weight: 600;
+}
+
+/* panel title icons */
+.tm_panel_title i{
+  color: #6f42c1;
+  font-size: 14px;
+}
+
+/* hover emphasis */
+.tm_tile:hover i,
+.tm_cardbox:hover i,
+.tm_side_list a:hover i{
+  color: #4f46e5;
+}
+
+/* ======================================================
+   FINAL ICON EMPHASIS (SAFE, ENTERPRISE STYLE)
+   ====================================================== */
+
+/* KPI title icons – subtle badge effect */
+.tm_tile_title i{
+  background: rgba(255,255,255,0.25);
+  padding: 3px 6px;
+  border-radius: 6px;
+  margin-right: 6px;
+}
+
+/* Sidebar icons – professional purple */
+.tm_sidebar i{
+  background: rgba(124,107,179,0.12);
+  padding: 4px 6px;
+  border-radius: 6px;
+}
+
+/* Small KPI card icons */
+.tm_cardbox_title i{
+  background: rgba(111,66,193,0.12);
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+/* Panel title icons */
+.tm_panel_title i{
+  background: rgba(111,66,193,0.12);
+  padding: 3px 6px;
+  border-radius: 6px;
+}
+
+/* Hover clarity */
+.tm_tile:hover i,
+.tm_cardbox:hover i,
+.tm_side_list a:hover i{
+  background: rgba(79,70,229,0.18);
+}
+
+/* =====================================================
+   ✅ ADDED: TREND BADGE (under KPI values)
+   - Works for both big tiles and small card boxes
+   - Green / Red / Neutral
+   - Looks like an executive badge
+   ===================================================== */
+
+.tm_kpi_trend{
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+/* On big colored tiles: keep it readable */
+.tm_tile .tm_kpi_trend{
+  background: rgba(255,255,255,.16);
+}
+
+/* On white cards: soft gray badge */
+.tm_cardbox .tm_kpi_trend{
+  background: rgba(108,117,125,.10);
+}
+
+.tm_trend_up{ color: #1bbb6e; }
+.tm_trend_down{ color: #ff5a4f; }
+.tm_trend_neutral{ color: rgba(255,255,255,.78); }
+
+/* Neutral on white cards should not be white */
+.tm_cardbox .tm_trend_neutral{
+  color: #9aa0a6;
+}
+
+/* =====================================================
+   EXECUTIVE DASHBOARD — STRONGER + CONTROLLED ANIMATIONS
+   - Strong shimmer (more visible)
+   - Only selected icons move:
+       * KPI tile title icons move
+       * Sidebar list link icons move
+       * Topbar module icons DO NOT move
+       * Panel title icons DO NOT move
+       * Small KPI card icons DO NOT move
+   ===================================================== */
+
+/* ✅ Keyframes must be TOP-LEVEL (plain CSS safe) */
+@keyframes tmFloatExecStrong {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-7px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes tmGlowExecStrong {
+  0%   { box-shadow: 0 1px 4px rgba(0,0,0,.08), 0 0 0 rgba(111,66,193,0); }
+  50%  { box-shadow: 0 18px 36px rgba(0,0,0,.16), 0 0 28px rgba(111,66,193,.26); }
+  100% { box-shadow: 0 1px 4px rgba(0,0,0,.08), 0 0 0 rgba(111,66,193,0); }
+}
+
+@keyframes tmShimmerExecStrong {
+  0%   { transform: translateX(-160%) skewX(-10deg); opacity: 0; }
+  10%  { opacity: .48; }
+  55%  { opacity: .48; }
+  100% { transform: translateX(160%) skewX(-10deg); opacity: 0; }
+}
+
+@keyframes tmIconBounceExec {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
+}
+
+@keyframes tmIconWiggleExec {
+  0%, 100% { transform: rotate(0deg); }
+  35%      { transform: rotate(-6deg); }
+  70%      { transform: rotate(6deg); }
+}
+
+/* ✅ Animate KPI big tiles (float + glow) */
+.tm_tile{
+  animation: tmFloatExecStrong 3.2s ease-in-out infinite, tmGlowExecStrong 3.2s ease-in-out infinite;
+}
+
+/* ✅ Strong shimmer ONLY for KPI big tiles */
+.tm_tile::after{
+  content:"";
+  position:absolute;
+  top:-55%;
+  left:-75%;
+  width:65%;
+  height:210%;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(255,255,255,.12) 18%,
+    rgba(255,255,255,.90) 45%,
+    rgba(255,255,255,.12) 72%,
+    transparent 100%
+  );
+  transform: translateX(-160%) skewX(-10deg);
+  opacity: 0;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  animation: tmShimmerExecStrong 2.35s ease-in-out infinite;
+}
+
+/* ✅ Stagger shimmer so tiles don't flash together */
+.tm_kpi_row > .tm_tile:nth-child(1)::after{ animation-delay: 0s; }
+.tm_kpi_row > .tm_tile:nth-child(2)::after{ animation-delay: .25s; }
+.tm_kpi_row > .tm_tile:nth-child(3)::after{ animation-delay: .50s; }
+.tm_kpi_row > .tm_tile:nth-child(4)::after{ animation-delay: .75s; }
+
+/* ✅ Small KPI cards: glow only (NO shimmer, NO icon movement) */
+.tm_cardbox{
+  animation: tmGlowExecStrong 6.0s ease-in-out infinite;
+}
+
+/* ✅ Panels: glow only (NO shimmer, NO icon movement) */
+.tm_panel{
+  animation: tmGlowExecStrong 7.0s ease-in-out infinite;
+}
+
+/* ✅ Sidebar box: glow only */
+.tm_sidebar{
+  animation: tmGlowExecStrong 7.6s ease-in-out infinite;
+}
+
+/* ✅ Only KPI tile title icons move */
+.tm_tile_title i{
+  display:inline-block;
+  animation: tmIconBounceExec 1.2s ease-in-out infinite;
+}
+
+/* ✅ Sidebar list link icons move (wiggle/bounce alternating) */
+.tm_side_list li:nth-child(odd) a i{
+  display:inline-block;
+  animation: tmIconWiggleExec 1.6s ease-in-out infinite;
+}
+.tm_side_list li:nth-child(even) a i{
+  display:inline-block;
+  animation: tmIconBounceExec 1.25s ease-in-out infinite;
+}
+
+/* ❌ Make sure these icons do NOT move */
+.tm_panel_title i,
+.tm_cardbox_title i,
+.tm_mod i{
+  animation: none !important;
+  transform: none !important;
+}
+
+/* Keep hover working on top of animation (smooth) */
+.tm_tile,
+.tm_cardbox,
+.tm_panel,
+.tm_sidebar{
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.tm_tile:hover,
+.tm_cardbox:hover,
+.tm_panel:hover{
+  transform: translateY(-10px);
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .tm_tile,
+  .tm_tile::after,
+  .tm_cardbox,
+  .tm_panel,
+  .tm_sidebar,
+  .tm_tile_title i,
+  .tm_side_list a i{
+    animation: none !important;
+    transition: none !important;
+  }
+}
+/* =====================================================
+   EXECUTIVE DASHBOARD — FILTER BAR BEAUTIFY (SCSS)
+   Add to: tailor_management/static/src/scss/<your_dashboard>.scss
+   (Does NOT change your layout logic, only styling)
+   ===================================================== */
+
+/* Filter bar container */
+.tm_filterbar{
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.10);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Labels */
+.tm_filterbar .form-label{
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .2px;
+  opacity: .9;
+}
+
+/* Inputs / selects */
+.tm_filterbar .form-control,
+.tm_filterbar .form-select{
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+  color: inherit;
+  height: 38px;
+  padding: 8px 12px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease, background .12s ease;
+}
+
+.tm_filterbar .form-control:focus,
+.tm_filterbar .form-select:focus{
+  outline: none;
+  border-color: rgba(255,255,255,.22);
+  background: rgba(255,255,255,.05);
+  box-shadow: 0 0 0 3px rgba(59,130,246,.18);
+  transform: translateY(-1px);
+}
+
+/* Disabled date inputs (when not custom) */
+.tm_filterbar .form-control[disabled]{
+  opacity: .55;
+  cursor: not-allowed;
+  filter: grayscale(.2);
+}
+
+/* Range group */
+.tm_range_group{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Pills group */
+.tm_range_pills{
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.02);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+.tm_range_pills .btn{
+  border: 0 !important;
+  font-weight: 800;
+  font-size: 12px;
+  padding: 8px 12px;
+  line-height: 1;
+  background: transparent;
+  color: inherit;
+  opacity: .85;
+  transition: transform .12s ease, opacity .12s ease, background .12s ease;
+}
+
+.tm_range_pills .btn:hover{
+  opacity: 1;
+  background: rgba(255,255,255,.05);
+  transform: translateY(-1px);
+}
+
+.tm_range_pills .btn.active{
+  opacity: 1;
+  background: rgba(59,130,246,.18);
+  box-shadow: inset 0 0 0 1px rgba(59,130,246,.35);
+}
+
+/* Actions area (buttons) */
+.tm_filterbar .btn{
+  border-radius: 12px;
+  height: 38px;
+  padding: 8px 14px;
+  font-weight: 900;
+  letter-spacing: .2px;
+  transition: transform .12s ease, box-shadow .12s ease, filter .12s ease;
+}
+
+.tm_filterbar .btn:hover{
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(0,0,0,.14);
+}
+
+.tm_filterbar .btn:active{
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+/* Make Apply stand out slightly */
+.tm_filterbar .btn.btn-primary{
+  box-shadow: 0 10px 22px rgba(37,99,235,.18);
+}
+
+.tm_filterbar .btn.btn-primary:hover{
+  filter: brightness(1.03);
+}
+
+/* Small spacing polish for tight screens */
+@media (max-width: 1100px){
+  .tm_filterbar{
+    padding: 10px;
+    gap: 10px !important;
+  }
+  .tm_filterbar .ms-auto{
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* =====================================================
+   OPTIONAL: Trend badge polish (if you want nicer look)
+   ===================================================== */
+.tm_kpi_trend{
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .2px;
+  border: 1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+  width: fit-content;
+}
+
+.tm_kpi_trend span{
+  font-weight: 900;
+  opacity: .95;
+}
+
+/* Color-coded trends */
+.tm_trend_up{
+  background: rgba(34,197,94,.12);
+  border-color: rgba(34,197,94,.25);
+}
+
+.tm_trend_down{
+  background: rgba(239,68,68,.12);
+  border-color: rgba(239,68,68,.25);
+}
+
+.tm_trend_neutral{
+  background: rgba(148,163,184,.10);
+  border-color: rgba(148,163,184,.20);
+}
+/* =====================================================
+   ✅ EXECUTIVE DASHBOARD — PREMIUM FINISH (ADD-ON)
+   Paste at the VERY END of your SCSS
+   - Consistent radius/shadows
+   - Better typography + spacing
+   - Scrollbar polish
+   - Table polish (zebra + hover)
+   - Focus states + accessibility
+   ===================================================== */
+
+:root{
+  --tm-radius: 12px;
+  --tm-radius-sm: 10px;
+  --tm-border: rgba(17,24,39,.08);
+  --tm-soft: rgba(17,24,39,.04);
+  --tm-shadow: 0 10px 28px rgba(0,0,0,.10);
+  --tm-shadow-soft: 0 1px 4px rgba(0,0,0,.08);
+  --tm-text: #111827;
+  --tm-muted: rgba(17,24,39,.65);
+  --tm-accent: #4f46e5;
+  --tm-accent-soft: rgba(79,70,229,.18);
+}
+
+/* Smooth text rendering */
+.o_tm_dash_root, .tm_dash_scroll{
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Make white cards look more “designed” */
+.tm_header,
+.tm_panel,
+.tm_cardbox,
+.tm_sidebar{
+  border: 1px solid var(--tm-border);
+  border-radius: var(--tm-radius);
+  box-shadow: var(--tm-shadow-soft);
+  background: #fff;
+}
+
+/* Slightly softer surfaces (helps premium look) */
+.tm_panel,
+.tm_cardbox,
+.tm_sidebar{
+  background: linear-gradient(180deg, #ffffff, #fbfbfd);
+}
+
+/* Consistent hover + active feel (no jumpy motion) */
+.tm_cardbox:hover,
+.tm_panel:hover,
+.tm_sidebar:hover{
+  box-shadow: var(--tm-shadow);
+}
+
+/* Better titles hierarchy */
+.tm_panel_title,
+.tm_sidebar_title{
+  font-size: 14px;
+  letter-spacing: .2px;
+}
+
+.tm_tile_title{
+  letter-spacing: .2px;
+}
+
+/* Muted text consistency */
+.tm_cardbox_title,
+.tm_cardbox_sub,
+.tm_tile_date,
+.tm_tile_foot{
+  color: rgba(255,255,255,.86);
+}
+.tm_cardbox_title,
+.tm_cardbox_sub{
+  color: var(--tm-muted);
+}
+
+/* Click targets: make “tile/card” taps feel nicer */
+.tm_tile:active,
+.tm_cardbox:active{
+  transform: translateY(0) scale(.995);
+}
+
+/* Stronger but clean focus ring (keyboard users) */
+.tm_tile:focus-visible,
+.tm_cardbox:focus-visible,
+.tm_panel:focus-visible,
+.tm_mod:focus-visible{
+  outline: 3px solid var(--tm-accent-soft);
+  outline-offset: 3px;
+}
+
+/* Topbar buttons: subtle border + depth */
+.tm_mod{
+  border-radius: 999px;
+  box-shadow: 0 10px 20px rgba(0,0,0,.14);
+  border: 1px solid rgba(255,255,255,.18);
+}
+
+/* Make KPI tiles feel “glassier” */
+.tm_tile{
+  border: 1px solid rgba(255,255,255,.14);
+}
+
+/* ---------------------------
+   Scrollbar polish (Chrome/Edge)
+   --------------------------- */
+.tm_dash_scroll::-webkit-scrollbar{ width: 10px; }
+.tm_dash_scroll::-webkit-scrollbar-track{ background: rgba(17,24,39,.06); border-radius: 999px; }
+.tm_dash_scroll::-webkit-scrollbar-thumb{
+  background: rgba(79,70,229,.35);
+  border-radius: 999px;
+  border: 2px solid rgba(255,255,255,.6);
+}
+.tm_dash_scroll::-webkit-scrollbar-thumb:hover{
+  background: rgba(79,70,229,.55);
+}
+
+/* Firefox scrollbar */
+.tm_dash_scroll{
+  scrollbar-width: thin;
+  scrollbar-color: rgba(79,70,229,.45) rgba(17,24,39,.08);
+}
+
+/* ---------------------------
+   Table polish inside panels
+   --------------------------- */
+.tm_panel table{
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+  border-radius: var(--tm-radius-sm);
+}
+
+/* Header cells */
+.tm_panel th{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f7f7fb;
+  color: var(--tm-text);
+  font-weight: 900;
+  font-size: 12px;
+  border-bottom: 1px solid var(--tm-border);
+  padding: 10px 10px;
+}
+
+/* Body cells */
+.tm_panel td{
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--tm-soft);
+  color: var(--tm-text);
+  font-size: 13px;
+}
+
+/* Zebra rows + hover */
+.tm_panel tbody tr:nth-child(even){
+  background: rgba(79,70,229,.03);
+}
+.tm_panel tbody tr:hover{
+  background: rgba(79,70,229,.08);
+}
+
+/* Round the table corners nicely */
+.tm_panel table tr:first-child th:first-child{ border-top-left-radius: var(--tm-radius-sm); }
+.tm_panel table tr:first-child th:last-child{ border-top-right-radius: var(--tm-radius-sm); }
+.tm_panel table tr:last-child td:first-child{ border-bottom-left-radius: var(--tm-radius-sm); }
+.tm_panel table tr:last-child td:last-child{ border-bottom-right-radius: var(--tm-radius-sm); }
+
+/* ---------------------------
+   Small responsive refinement
+   --------------------------- */
+@media (max-width: 1200px){
+  .tm_header,
+  .tm_panel,
+  .tm_cardbox,
+  .tm_sidebar{
+    border-radius: 14px;
+  }
+}
+
+/* Respect reduced motion (keep your rule, but tighten active press feel) */
+@media (prefers-reduced-motion: reduce){
+  .tm_tile:active,
+  .tm_cardbox:active{
+    transform: none !important;
+  }
+}

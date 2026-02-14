@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_tailor_order_form_inherit_ai_button" model="ir.ui.view">
+        <field name="name">tailor.order.form.inherit.ai.button</field>
+        <field name="model">tailor.order</field>
+        <field name="inherit_id" ref="tailor_management.view_tailor_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/header/field[@name='status']" position="after">
+                <button name="action_open_ai_measure_wizard"
+                        type="object"
+                        string="AI Measure"
+                        class="btn-primary"
+                        icon="fa-magic"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

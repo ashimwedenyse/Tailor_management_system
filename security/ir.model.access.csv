@@ -1,0 +1,45 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_tailor_order_admin,tailor.order admin,model_tailor_order,tailor_management.group_tailor_admin,1,1,1,1
+access_tailor_order_sales,tailor.order sales,model_tailor_order,tailor_management.group_tailor_sales,1,1,1,0
+access_tailor_order_tailor,tailor.order tailor,model_tailor_order,tailor_management.group_tailor_tailor,1,1,0,0
+access_tailor_order_qc,tailor.order qc,model_tailor_order,tailor_management.group_tailor_qc,1,1,0,0
+access_sale_order_admin,sale.order admin,sale.model_sale_order,tailor_management.group_tailor_admin,1,1,1,1
+access_sale_order_sales,sale.order sales,sale.model_sale_order,tailor_management.group_tailor_sales,1,1,1,0
+access_sale_order_tailor,sale.order tailor read,sale.model_sale_order,tailor_management.group_tailor_tailor,1,0,0,0
+access_sale_order_qc,sale.order qc read,sale.model_sale_order,tailor_management.group_tailor_qc,1,0,0,0
+access_customer_measurements_sales,customer.measurements sales,model_customer_measurements,tailor_management.group_tailor_sales,1,1,1,0
+access_customer_measurements_tailor,customer.measurements tailor,model_customer_measurements,tailor_management.group_tailor_tailor,1,1,1,0
+access_customer_measurements_qc,customer.measurements qc,model_customer_measurements,tailor_management.group_tailor_qc,1,1,1,0
+access_customer_measurements_admin,customer.measurements admin,model_customer_measurements,tailor_management.group_tailor_admin,1,1,1,1
+access_customer_documents_sales,customer.documents sales,model_customer_documents,tailor_management.group_tailor_sales,1,1,1,0
+access_customer_documents_tailor,customer.documents tailor,model_customer_documents,tailor_management.group_tailor_tailor,1,1,1,0
+access_customer_documents_qc,customer.documents qc,model_customer_documents,tailor_management.group_tailor_qc,1,1,1,0
+access_customer_documents_admin,customer.documents admin,model_customer_documents,tailor_management.group_tailor_admin,1,1,1,1
+access_customer_documents_portal,customer.documents portal,model_customer_documents,base.group_portal,1,0,0,0
+access_customer_document_folder_admin,customer.document.folder admin,model_customer_document_folder,tailor_management.group_tailor_admin,1,1,1,1
+access_customer_document_tag_admin,customer.document.tag admin,model_customer_document_tag,tailor_management.group_tailor_admin,1,1,1,1
+access_ir_attachment_portal,ir.attachment portal,base.model_ir_attachment,base.group_portal,1,0,1,0
+access_tailor_accessory_line_sales,tailor.accessory.line sales,model_tailor_accessory_line,tailor_management.group_tailor_sales,1,1,1,0
+access_tailor_accessory_line_tailor,tailor.accessory.line tailor,model_tailor_accessory_line,tailor_management.group_tailor_tailor,1,1,1,0
+access_tailor_accessory_line_qc,tailor.accessory.line qc,model_tailor_accessory_line,tailor_management.group_tailor_qc,1,1,1,0
+access_tailor_accessory_line_admin,tailor.accessory.line admin,model_tailor_accessory_line,tailor_management.group_tailor_admin,1,1,1,1
+
+
+access_tailor_vat_report_sales,tailor.vat.report sales,model_tailor_vat_report,tailor_management.group_tailor_sales,1,0,0,0
+access_tailor_aging_receivable_sales,tailor.aging.receivable.report sales,model_tailor_aging_receivable_report,tailor_management.group_tailor_sales,1,0,0,0
+access_tailor_cogs_report_sales,tailor.cogs.report sales,model_tailor_cogs_report,tailor_management.group_tailor_sales,1,0,0,0
+
+access_tailor_vat_report_admin,tailor.vat.report admin,model_tailor_vat_report,tailor_management.group_tailor_admin,1,1,1,1
+access_tailor_aging_receivable_admin,tailor.aging.receivable.report admin,model_tailor_aging_receivable_report,tailor_management.group_tailor_admin,1,1,1,1
+access_tailor_cogs_report_admin,tailor.cogs.report admin,model_tailor_cogs_report,tailor_management.group_tailor_admin,1,1,1,1
+
+
+access_tailor_sales_report_manager,tailor.sales.report manager,model_tailor_sales_report,sales_team.group_sale_manager,1,0,0,0
+access_tailor_sales_report_sales,tailor.sales.report sales,model_tailor_sales_report,sales_team.group_sale_salesman,1,0,0,0
+access_tailor_sales_report_tailor_sales,tailor.sales.report tailor sales,model_tailor_sales_report,tailor_management.group_tailor_sales,1,0,0,0
+
+
+access_tailor_production_report_manager,tailor.production.report manager,model_tailor_production_report,base.group_system,1,0,0,0
+
+
+access_tailor_ai_measure_wizard,tailor.ai.measure.wizard,model_tailor_ai_measure_wizard,base.group_user,1,1,1,0
