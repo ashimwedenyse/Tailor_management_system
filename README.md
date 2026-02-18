@@ -83,4 +83,4 @@ platform Odoo
 
 Backend: Python
 
-Database: postgress
+Database: PostgreSQL
